@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: default-gateway
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: message-service
+#          uri: lb://MESSAGE-SERVICE
+#          predicates:
+#            - Cookie=mycookie,mycookievalue
+#            - Path=/message/**
+
+server:
+  port: 8080
+
+# Zipkin
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE
