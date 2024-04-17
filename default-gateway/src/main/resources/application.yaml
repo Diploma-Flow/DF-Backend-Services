@@ -25,3 +25,7 @@ logging:
       springframework:
         cloud:
           gateway: TRACE
+
+public:
+  routes:
+  - /auth/**
