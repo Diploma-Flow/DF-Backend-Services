@@ -24,7 +24,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("ENTERING: CustomGlobalFilter");
+        log.trace("ENTERING: CustomGlobalFilter");
         String path = exchange
                 .getRequest()
                 .getPath()

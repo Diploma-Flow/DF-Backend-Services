@@ -28,6 +28,5 @@ public class WebFluxUtils {
         return exchange
                 .getResponse()
                 .writeWith(Mono.just(buffer));
-//                .then(Mono.error(new IllegalStateException(message)));
     }
 }

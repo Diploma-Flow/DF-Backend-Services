@@ -46,7 +46,8 @@ public class AuthController {
         return null;
     }
 
-    @PostMapping("/validate")
+    //TODO this should be POST but for testing purposes it is GET
+    @GetMapping("/validate")
     public ResponseEntity<Object> validate() {
         final String methodName = "validate";
         log.entering(SOURCE_CLASS, methodName);
@@ -54,11 +55,6 @@ public class AuthController {
 //        AuthenticationResponse authenticationResponse = authService.validate(request);
         //TODO make the validate to return Response entity
 
-        return null;
-    }
-
-    @GetMapping("/security-check")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.status(HttpStatus.OK).body("Access granted! (Auth-service)");
+        return ResponseEntity.status(HttpStatus.OK).body("VALID");
     }
 }
