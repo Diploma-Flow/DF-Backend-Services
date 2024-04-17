@@ -6,12 +6,10 @@ import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.service.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Author: Simeon Popov
@@ -57,5 +55,10 @@ public class AuthController {
         //TODO make the validate to return Response entity
 
         return null;
+    }
+
+    @GetMapping("/security-check")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.status(HttpStatus.OK).body("Access granted! (Auth-service)");
     }
 }

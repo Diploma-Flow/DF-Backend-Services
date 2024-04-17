@@ -18,11 +18,6 @@ import org.springframework.web.client.RestTemplate;
 public class GatewayConfig {
 
     @Bean
-    public GlobalFilter customFilter(CustomGlobalFilter customGlobalFilter) {
-        return customGlobalFilter;
-    }
-
-    @Bean
     @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();

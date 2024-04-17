@@ -1,32 +1,35 @@
-package org.simo.defaultgateway.filters;
+package org.simo.defaultgateway.service;
 
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.simo.defaultgateway.properties.PublicRoutes;
+import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
-
-import java.util.List;
 
 /**
  * Author: Simeon Popov
  * Date of creation: 7.4.2024 г.
  */
 
-@Component
-public class RouteValidator {
+@Log4j2
+@Service
+@RequiredArgsConstructor
+public class RouteValidatorService {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    private static final List<String> PUBLIC_API_ENDPOINTS = List.of(
-            "/auth/**"
-    );
+    private final PublicRoutes publicRoutes;
 
     public boolean isRouteProtected(String route) {
-        return PUBLIC_API_ENDPOINTS
+        return publicRoutes
+                .getRoutes()
                 .stream()
                 .noneMatch(uri -> pathMatcher.match(uri, route));
     }
 
     public boolean isRoutePublic(String route) {
-        return PUBLIC_API_ENDPOINTS
+        return publicRoutes
+                .getRoutes()
                 .stream()
                 .anyMatch(uri -> pathMatcher.match(uri, route));
     }
