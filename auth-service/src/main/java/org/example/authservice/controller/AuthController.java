@@ -7,7 +7,7 @@ import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.service.AuthService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,15 +46,20 @@ public class AuthController {
         return null;
     }
 
+    //TODO this should be POST but for testing purposes it is GET
     @PostMapping("/validate")
-    public ResponseEntity<Object> validate() {
+    public ResponseEntity<Object> validate(@RequestBody String jwtToken){
         final String methodName = "validate";
         log.entering(SOURCE_CLASS, methodName);
+        boolean isJwtValid = authService.validate(jwtToken);
 
-//        AuthenticationResponse authenticationResponse = authService.validate(request);
-        //TODO make the validate to return Response entity
+        if (!isJwtValid) {
+            log.info("JWT failed authentication");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        return null;
+        log.info("JWT passed authentication successfully");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/security-check")

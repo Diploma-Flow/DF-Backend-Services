@@ -26,6 +26,10 @@ logging:
         cloud:
           gateway: TRACE
 
+auth-service:
+  validation:
+    url: 'lb://auth-service/auth/validate'
+
 public:
   routes:
   - /auth/**

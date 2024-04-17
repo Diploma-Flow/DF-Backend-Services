@@ -5,14 +5,13 @@ import lombok.extern.log4j.Log4j2;
 import org.simo.defaultgateway.service.JwtValidatorService;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
+import java.util.function.Function;
 
 import static org.simo.defaultgateway.utils.WebFluxUtils.onError;
 
@@ -30,7 +29,7 @@ public class JwtValidationGatewayFilterFactory implements GatewayFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("ENTERING: JwtValidationGatewayFilterFactory");
+        log.trace("ENTERING: JwtValidationGatewayFilterFactory");
 
         ServerHttpRequest request = exchange.getRequest();
 
@@ -48,7 +47,7 @@ public class JwtValidationGatewayFilterFactory implements GatewayFilter {
             return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
         }
 
-        if(jwtValidatorService.isBearerMissing(request)){
+        if (jwtValidatorService.isBearerMissing(request)) {
             String errorMessage = "Bearer token is missing";
             log.warn(errorMessage);
 
@@ -62,13 +61,22 @@ public class JwtValidationGatewayFilterFactory implements GatewayFilter {
             return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
         }
 
-        if (!jwtValidatorService.isJwtValid(request)) {
+        return jwtValidatorService
+                .isJwtValid(request)
+                .flatMap(handleJwtValidationResult(exchange, chain));
+    }
+
+    private static Function<Boolean, Mono<? extends Void>> handleJwtValidationResult(ServerWebExchange exchange, GatewayFilterChain chain) {
+        return valid -> {
+            if (valid) {
+                log.info("JWT is valid");
+                return chain.filter(exchange); // Proceed with the request
+            }
+
             String errorMessage = "JWT is NOT valid";
             log.warn(errorMessage);
 
             return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
-        }
-
-            return chain.filter(exchange);
+        };
     }
 }

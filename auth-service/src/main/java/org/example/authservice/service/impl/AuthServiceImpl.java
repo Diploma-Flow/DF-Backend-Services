@@ -30,4 +30,9 @@ public class AuthServiceImpl implements AuthService {
     public AuthenticationResponse login(LoginRequest request) {
         return null;
     }
+
+    @Override
+    public boolean validate(String jwtToken) {
+        return true;
+    }
 }
