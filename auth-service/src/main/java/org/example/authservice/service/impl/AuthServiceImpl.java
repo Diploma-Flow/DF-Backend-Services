@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
+import org.example.authservice.response.JwtValidationResponse;
 import org.example.authservice.service.AuthService;
 import org.example.authservice.service.JwtService;
 import org.example.authservice.service.TokenService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,8 +33,10 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
+    //THIS is made to send response and status 200 OK and 401 UNAUTHORIZED every other status will be considered as error
     @Override
-    public boolean validate(String jwtToken) {
-        return true;
+    public JwtValidationResponse validate(String jwtToken) {
+        return JwtValidationResponse
+                .builder().response("SUCCESS").httpStatus(HttpStatus.OK).build();
     }
 }

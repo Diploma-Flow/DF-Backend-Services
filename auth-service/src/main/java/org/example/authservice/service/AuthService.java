@@ -3,6 +3,7 @@ package org.example.authservice.service;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
+import org.example.authservice.response.JwtValidationResponse;
 
 /**
  * Author: Simeon Popov
@@ -13,5 +14,5 @@ public interface AuthService {
 
     AuthenticationResponse login(LoginRequest request);
 
-    boolean validate(String jwtToken);
+    JwtValidationResponse validate(String jwtToken);
 }

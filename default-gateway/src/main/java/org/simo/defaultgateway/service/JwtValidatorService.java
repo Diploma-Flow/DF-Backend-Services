@@ -2,6 +2,7 @@ package org.simo.defaultgateway.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.simo.defaultgateway.response.JwtValidationResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -52,7 +53,7 @@ public class JwtValidatorService {
         return !token.isBlank() && token.matches(JWT_VALIDATION_REGEX);
     }
 
-    public Mono<Boolean> isJwtValid(ServerHttpRequest request) {
+    public Mono<JwtValidationResponse> isJwtValid(ServerHttpRequest request) {
         String token = getAuthHeader(request).substring(7);
 
         return webClientBuilder
@@ -62,13 +63,11 @@ public class JwtValidatorService {
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(token)
                 .exchangeToMono(response -> {
-                    if (response.statusCode().isError()) {
-                        log.error("Error while validating JWT. Response status code: {}", response.statusCode());
-                        return Mono.error(new IllegalStateException("Error while validating JWT"));
+                    if (response.statusCode().is4xxClientError() || response.statusCode().is2xxSuccessful()) {
+                        return response.bodyToMono(JwtValidationResponse.class);
                     }
 
-                    return Mono.just(response);
-                })
-                .map(response -> response.statusCode().equals(HttpStatus.OK));
+                    return response.createError();
+                });
     }
 }
