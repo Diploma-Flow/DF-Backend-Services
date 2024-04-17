@@ -5,6 +5,7 @@ import lombok.extern.java.Log;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
+import org.example.authservice.response.ValidationResponse;
 import org.example.authservice.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -48,13 +49,13 @@ public class AuthController {
 
     //TODO this should be POST but for testing purposes it is GET
     @GetMapping("/validate")
-    public ResponseEntity<Object> validate() {
+    public ResponseEntity<ValidationResponse> validate(@RequestAttribute("jwtToken") String jwtToken){
         final String methodName = "validate";
         log.entering(SOURCE_CLASS, methodName);
 
-//        AuthenticationResponse authenticationResponse = authService.validate(request);
+        ValidationResponse validationResponse = authService.validate(jwtToken);
         //TODO make the validate to return Response entity
 
-        return ResponseEntity.status(HttpStatus.OK).body("VALID");
+        return ResponseEntity.status(HttpStatus.OK).body(validationResponse);
     }
 }
