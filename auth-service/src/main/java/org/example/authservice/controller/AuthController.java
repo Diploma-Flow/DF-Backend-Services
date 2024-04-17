@@ -5,10 +5,8 @@ import lombok.extern.java.Log;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
-import org.example.authservice.response.ValidationResponse;
 import org.example.authservice.service.AuthService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,14 +46,18 @@ public class AuthController {
     }
 
     //TODO this should be POST but for testing purposes it is GET
-    @GetMapping("/validate")
-    public ResponseEntity<ValidationResponse> validate(@RequestAttribute("jwtToken") String jwtToken){
+    @PostMapping("/validate")
+    public ResponseEntity<Object> validate(@RequestBody String jwtToken){
         final String methodName = "validate";
         log.entering(SOURCE_CLASS, methodName);
+        boolean isJwtValid = authService.validate(jwtToken);
 
-        ValidationResponse validationResponse = authService.validate(jwtToken);
-        //TODO make the validate to return Response entity
+        if (!isJwtValid) {
+            log.info("JWT failed authentication");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        return ResponseEntity.status(HttpStatus.OK).body(validationResponse);
+        log.info("JWT passed authentication successfully");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

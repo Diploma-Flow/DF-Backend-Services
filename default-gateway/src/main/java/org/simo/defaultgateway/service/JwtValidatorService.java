@@ -1,10 +1,12 @@
 package org.simo.defaultgateway.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,12 +22,10 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class JwtValidatorService {
 
+    private static final String JWT_VALIDATION_REGEX = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_.+/=]*$";
+    private final WebClient.Builder webClientBuilder;
     @Value("${auth-service.validation.url}")
     private String AUTH_SERVICE_VALIDATION_URL;
-
-    private static final String JWT_VALIDATION_REGEX = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_.+/=]*$";
-
-    private final WebClient.Builder webClientBuilder;
 
     public boolean isAuthMissing(ServerHttpRequest request) {
         return !request
@@ -55,12 +55,20 @@ public class JwtValidatorService {
     public Mono<Boolean> isJwtValid(ServerHttpRequest request) {
         String token = getAuthHeader(request).substring(7);
 
-        return webClientBuilder.build()
-                .get()
+        return webClientBuilder
+                .build()
+                .post()
                 .uri(AUTH_SERVICE_VALIDATION_URL)
-                .retrieve()
-                .bodyToMono(String.class)
-                .map(body -> body.equals("VALID"))
-                .defaultIfEmpty(false);
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(token)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().isError()) {
+                        log.error("Error while validating JWT. Response status code: {}", response.statusCode());
+                        return Mono.error(new IllegalStateException("Error while validating JWT"));
+                    }
+
+                    return Mono.just(response);
+                })
+                .map(response -> response.statusCode().equals(HttpStatus.OK));
     }
 }
