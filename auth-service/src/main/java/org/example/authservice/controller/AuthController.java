@@ -7,6 +7,7 @@ import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.service.AuthService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,5 +60,10 @@ public class AuthController {
 
         log.info("JWT passed authentication successfully");
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/security-check")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.status(HttpStatus.OK).body("Access granted! (Auth-service)");
     }
 }
