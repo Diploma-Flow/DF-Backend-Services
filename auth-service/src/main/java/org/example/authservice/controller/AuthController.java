@@ -46,7 +46,6 @@ public class AuthController {
         return null;
     }
 
-    //TODO this should be POST but for testing purposes it is GET
     @PostMapping("/validate")
     public ResponseEntity<JwtValidationResponse> validate(@RequestBody String jwtToken){
         final String methodName = "validate";
@@ -54,10 +53,5 @@ public class AuthController {
 
         JwtValidationResponse jwtValidationResponse = authService.validate(jwtToken);
         return ResponseEntity.status(jwtValidationResponse.getHttpStatus()).body(jwtValidationResponse);
-    }
-
-    @GetMapping("/security-check")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.status(HttpStatus.OK).body("Access granted! (Auth-service)");
     }
 }
