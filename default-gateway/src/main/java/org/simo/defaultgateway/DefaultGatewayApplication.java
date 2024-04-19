@@ -22,6 +22,9 @@ public class DefaultGatewayApplication {
                 .route("message-service", r -> r.path("/message/**")
                         .uri("lb://MESSAGE-SERVICE"))
 
+                .route("user-service", r -> r.path("/user/**")
+                        .uri("lb://USER-SERVICE"))
+
                 .route("eureka-dashboard", r -> r.path("/eureka/main")
                         .filters(f -> f.rewritePath("/eureka/main", "/"))
                         .uri("http://localhost:8761"))

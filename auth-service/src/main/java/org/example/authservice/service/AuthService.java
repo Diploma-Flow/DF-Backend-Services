@@ -1,7 +1,7 @@
 package org.example.authservice.service;
 
-import org.example.authservice.request.LoginRequest;
-import org.example.authservice.request.RegisterRequest;
+import org.example.authservice.request.inbound.LoginRequest;
+import org.example.authservice.request.inbound.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
 

@@ -2,12 +2,11 @@ package org.example.authservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.example.authservice.request.LoginRequest;
-import org.example.authservice.request.RegisterRequest;
+import org.example.authservice.request.inbound.LoginRequest;
+import org.example.authservice.request.inbound.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
 import org.example.authservice.service.AuthService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +30,7 @@ public class AuthController {
         log.entering(SOURCE_CLASS, methodName);
 
         AuthenticationResponse authenticationResponse = authService.register(request);
-        //TODO make the register to return Response entity
-        return null;
+        return ResponseEntity.ok(authenticationResponse);
     }
 
     @PostMapping("/login")

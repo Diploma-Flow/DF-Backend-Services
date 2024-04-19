@@ -16,14 +16,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document("user_tokens")
+@Document(collection = "user-tokens")
 public class UserTokens {
 
     @Id
     private String id;
 
     @Indexed(unique = true)
-    private String ownerId;
+    private String ownerEmail;
 
     private Token accessToken;
     private Token refreshToken;

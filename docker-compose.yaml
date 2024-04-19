@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: message-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - data:/data
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=rootuser
+      - MONGO_INITDB_ROOT_PASSWORD=rootpass
+
+  users-db:
+    image: mysql:latest
+    container_name: users-mysqldb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secretPassword
+      MYSQL_DATABASE: Users
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
+
+volumes:
+  data: {}
+  mysql-data: {}
+
+networks:
+  default:
+    name: message-mongodb-network

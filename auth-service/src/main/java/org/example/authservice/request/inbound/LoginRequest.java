@@ -1,8 +1,7 @@
-package org.example.authservice.request;
+package org.example.authservice.request.inbound;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Author: Simeon Popov
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class RegisterRequest {
+public class LoginRequest {
     private final String email;
     private final String password;
 }
