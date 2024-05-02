@@ -4,16 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
 import org.example.authservice.data.enums.UserRole;
-import org.example.authservice.dto.inbound.login.LoginRequest;
-import org.example.authservice.dto.inbound.register.RegisterRequest;
-import org.example.authservice.dto.outbound.login.LoginResponse;
-import org.example.authservice.dto.outbound.register.RegisterResponse;
+import org.example.authservice.dto.login.LoginRequest;
+import org.example.authservice.dto.register.RegisterRequest;
+import org.example.authservice.dto.login.LoginResponse;
+import org.example.authservice.dto.register.RegisterResponse;
+import org.example.authservice.dto.register.RegisterUserRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
 import org.example.authservice.response.TokenData;
 import org.example.authservice.service.AuthService;
 import org.example.authservice.service.JwtService;
 import org.example.authservice.service.TokenService;
+import org.example.authservice.service.UserService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,31 +38,16 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtService jwtService;
     private final TokenService tokenService;
-    private final RestTemplate restTemplate;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+
+    //FIXME make two object RegisteredUser and LoggedInUser
 
     @Override
     public AuthenticationResponse<TokenData> register(RegisterRequest request) {
-        //TODO to use model mapper here
-        RegisterRequest registerUserRequest = RegisterRequest
-                .builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .build();
 
-
-//        User savedUser = restTemplate.postForObject("http://user-service/user/register", saveUserRequest, User.class);
-
-        RegisterResponse<User> registerResponse = RegisterResponse
-                .<User>builder()
-                .httpStatus(HttpStatus.OK)
-                .response("Saved successfully")
-                .data(new User(request.getEmail(), UserRole.STUDENT, ""))
-                .build();
-
-        User user = registerResponse.getData();
+        RegisterResponse<User> userRegisterResponse = userService.registerUser(request);
+        User user = userRegisterResponse.getData();
 
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
 
@@ -78,17 +65,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthenticationResponse<TokenData> login(LoginRequest request) {
 
-        //SEND login request
-        //THEN:
-        LoginResponse<User> loginResponse = LoginResponse
-                .<User>builder()
-                .httpStatus(HttpStatus.OK)
-                .response("Found successfully")
-                .data(new User(request.getEmail(), UserRole.STUDENT, passwordEncoder.encode(request.getPassword())))
-                .build();
-
-
-        User user = loginResponse.getData();
+        LoginResponse<User> userLoginResponse = userService.loginUser(request);
+        User user = userLoginResponse.getData();
 
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return buildAuthResponseError(HttpStatus.UNAUTHORIZED, "Invalid email or password");

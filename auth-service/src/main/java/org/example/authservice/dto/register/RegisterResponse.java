@@ -1,8 +1,9 @@
-package org.example.authservice.dto.outbound.login;
+package org.example.authservice.dto.register;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.example.authservice.data.enums.UserRole;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -13,7 +14,7 @@ import org.springframework.http.HttpStatus;
 @Data
 @Builder
 @AllArgsConstructor
-public class LoginResponse<T> {
+public class RegisterResponse<T> {
     private String response;
     private HttpStatus httpStatus;
     private T data;

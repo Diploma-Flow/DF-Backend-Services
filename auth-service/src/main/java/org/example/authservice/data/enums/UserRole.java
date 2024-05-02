@@ -6,5 +6,5 @@ package org.example.authservice.data.enums;
  */
 
 public enum UserRole {
-    STUDENT, PROFESSOR
+    STUDENT, PROFESSOR, GUEST
 }

@@ -5,5 +5,5 @@ package org.example.userservice.user.details.data.enums;
  * Date of creation: 11.1.2024 г.
  */
 public enum UserRole {
-    STUDENT, PROFESSOR
+    STUDENT, PROFESSOR, GUEST
 }

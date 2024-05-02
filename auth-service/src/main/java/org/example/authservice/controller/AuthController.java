@@ -2,8 +2,8 @@ package org.example.authservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.example.authservice.dto.inbound.login.LoginRequest;
-import org.example.authservice.dto.inbound.register.RegisterRequest;
+import org.example.authservice.dto.login.LoginRequest;
+import org.example.authservice.dto.register.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
 import org.example.authservice.response.TokenData;

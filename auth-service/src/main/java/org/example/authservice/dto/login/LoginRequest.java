@@ -1,4 +1,4 @@
-package org.example.authservice.dto.inbound.login;
+package org.example.authservice.dto.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
