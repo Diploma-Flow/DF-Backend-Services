@@ -2,8 +2,8 @@ package org.example.authservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.example.authservice.request.inbound.LoginRequest;
-import org.example.authservice.request.inbound.RegisterRequest;
+import org.example.authservice.dto.inbound.login.LoginRequest;
+import org.example.authservice.dto.inbound.register.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
 import org.example.authservice.response.TokenData;
@@ -35,14 +35,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthenticationResponse<TokenData>> login(@RequestBody LoginRequest request) {
         final String methodName = "login";
         log.entering(SOURCE_CLASS, methodName);
 
-        AuthenticationResponse authenticationResponse = authService.login(request);
-        //TODO make the login to return Response entity
-
-        return null;
+        AuthenticationResponse<TokenData> authenticationResponse = authService.login(request);
+        return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
     }
 
     @PostMapping("/validate")

@@ -16,4 +16,5 @@ import org.example.authservice.data.enums.UserRole;
 public class User {
     private final String email;
     private final UserRole role;
+    private final String password;
 }

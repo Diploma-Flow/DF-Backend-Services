@@ -1,6 +1,7 @@
-package org.example.authservice.request.inbound;
+package org.example.authservice.dto.inbound.login;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  */
 
 @Data
+@Builder
 @AllArgsConstructor
 public class LoginRequest {
     private final String email;

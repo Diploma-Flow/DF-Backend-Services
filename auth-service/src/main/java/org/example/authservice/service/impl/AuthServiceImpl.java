@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
 import org.example.authservice.data.enums.UserRole;
-import org.example.authservice.request.inbound.LoginRequest;
-import org.example.authservice.request.inbound.RegisterRequest;
-import org.example.authservice.request.outbound.SaveUserRequest;
+import org.example.authservice.dto.inbound.login.LoginRequest;
+import org.example.authservice.dto.inbound.register.RegisterRequest;
+import org.example.authservice.dto.outbound.login.LoginResponse;
+import org.example.authservice.dto.outbound.register.RegisterResponse;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
 import org.example.authservice.response.TokenData;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+
+import static org.example.authservice.util.AuthenticationResponseUtil.buildAuthResponseError;
+import static org.example.authservice.util.AuthenticationResponseUtil.buildAuthResponseOk;
 
 /**
  * Author: Simeon Popov
@@ -37,7 +41,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse<TokenData> register(RegisterRequest request) {
-        SaveUserRequest saveUserRequest = SaveUserRequest
+        //TODO to use model mapper here
+        RegisterRequest registerUserRequest = RegisterRequest
                 .builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -45,37 +50,62 @@ public class AuthServiceImpl implements AuthService {
                 .lastName(request.getLastName())
                 .build();
 
-//        User savedUser = restTemplate.postForObject("http://user-service/user/save", saveUserRequest, User.class);
 
-        User savedUser = User.builder()
-                .email(request.getEmail())
-                .role(UserRole.STUDENT)
+//        User savedUser = restTemplate.postForObject("http://user-service/user/register", saveUserRequest, User.class);
+
+        RegisterResponse<User> registerResponse = RegisterResponse
+                .<User>builder()
+                .httpStatus(HttpStatus.OK)
+                .response("Saved successfully")
+                .data(new User(request.getEmail(), UserRole.STUDENT, ""))
                 .build();
 
-        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(savedUser);
+        User user = registerResponse.getData();
+
+        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
 
         try {
-            tokenService.persist(savedUser, jwtTokens);
+            tokenService.persist(user, jwtTokens);
 
         } catch (DataIntegrityViolationException e) {
             //log the error
-            return AuthenticationResponse.<TokenData>builder()
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .response("Registration failed: " + e.getMessage())
-                    .build();
+            return buildAuthResponseError(HttpStatus.BAD_REQUEST, "Registration failed: " + e.getMessage());
         }
 
-        return AuthenticationResponse.<TokenData>builder()
-                .httpStatus(HttpStatus.OK)
-                .data(TokenData.builder().accessToken(jwtTokens.get(TokenType.ACCESS)).refreshToken(jwtTokens.get(TokenType.REFRESH)).build())
-                .response("Registration successful")
-                .build();
+        return buildAuthResponseOk(jwtTokens, "Registration successful");
     }
 
     @Override
-    public AuthenticationResponse login(LoginRequest request) {
-        //TODO check if user exists in user-service
-        return null;
+    public AuthenticationResponse<TokenData> login(LoginRequest request) {
+
+        //SEND login request
+        //THEN:
+        LoginResponse<User> loginResponse = LoginResponse
+                .<User>builder()
+                .httpStatus(HttpStatus.OK)
+                .response("Found successfully")
+                .data(new User(request.getEmail(), UserRole.STUDENT, passwordEncoder.encode(request.getPassword())))
+                .build();
+
+
+        User user = loginResponse.getData();
+
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return buildAuthResponseError(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+
+        // Generate JWT tokens for the retrieved user
+        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
+
+        try {
+            tokenService.persist(user, jwtTokens);
+
+        } catch (DataIntegrityViolationException e) {
+            //log the error
+            return buildAuthResponseError(HttpStatus.BAD_REQUEST, "Login failed: " + e.getMessage());
+        }
+
+        return buildAuthResponseOk(jwtTokens, "Login successful");
     }
 
     //THIS is made to send response and status 200 OK and 401 UNAUTHORIZED every other status will be considered as error
@@ -84,6 +114,9 @@ public class AuthServiceImpl implements AuthService {
         //TODO use jwt do decrypt and check if the token is not expired
         //TODO if token not expired return 200 OK
         return JwtValidationResponse
-                .builder().response("SUCCESS").httpStatus(HttpStatus.OK).build();
+                .builder()
+                .response("SUCCESS")
+                .httpStatus(HttpStatus.OK)
+                .build();
     }
 }

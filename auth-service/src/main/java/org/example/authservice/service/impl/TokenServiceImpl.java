@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.authservice.data.Token;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
-import org.example.authservice.data.entity.UserTokens;
-import org.example.authservice.data.repository.UserTokensRepository;
+import org.example.authservice.model.UserTokens;
+import org.example.authservice.repository.UserTokensRepository;
 import org.example.authservice.service.TokenService;
 import org.springframework.stereotype.Service;
 

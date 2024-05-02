@@ -1,4 +1,4 @@
-package org.example.authservice.data.entity;
+package org.example.authservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
