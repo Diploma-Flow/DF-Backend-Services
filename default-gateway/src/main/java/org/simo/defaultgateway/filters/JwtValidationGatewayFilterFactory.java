@@ -2,6 +2,7 @@ package org.simo.defaultgateway.filters;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.simo.defaultgateway.exception.AuthenticationException;
 import org.simo.defaultgateway.response.JwtValidationResponse;
 import org.simo.defaultgateway.service.JwtValidatorService;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -34,32 +35,15 @@ public class JwtValidationGatewayFilterFactory implements GatewayFilter {
 
         ServerHttpRequest request = exchange.getRequest();
 
-        if (jwtValidatorService.isAuthMissing(request)) {
-            String errorMessage = "Authorization header is missing in request";
-            log.warn(errorMessage);
+        try {
+            jwtValidatorService.validateAuth(request);
+            jwtValidatorService.validateAuthHeader(request);
+            jwtValidatorService.validateBearer(request);
+            jwtValidatorService.validateJwtFormat(request);
 
-            return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
-        }
-
-        if (jwtValidatorService.isAuthHeaderBlank(request)) {
-            String errorMessage = "Authorization header is empty";
-            log.warn(errorMessage);
-
-            return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
-        }
-
-        if (jwtValidatorService.isBearerMissing(request)) {
-            String errorMessage = "Bearer token is missing";
-            log.warn(errorMessage);
-
-            return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
-        }
-
-        if (!jwtValidatorService.isJwtFormatValid(request)) {
-            String errorMessage = "JWT format is NOT valid";
-            log.warn(errorMessage);
-
-            return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
+        } catch (AuthenticationException e) {
+            log.warn(e.getMessage());
+            return onError(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
         }
 
         return jwtValidatorService
@@ -71,7 +55,7 @@ public class JwtValidationGatewayFilterFactory implements GatewayFilter {
         return response -> {
             HttpStatus responseHttpStatus = response.getHttpStatus();
 
-            if (responseHttpStatus.is2xxSuccessful()){
+            if (responseHttpStatus.is2xxSuccessful()) {
                 log.info("JWT is valid");
                 return chain.filter(exchange);
             }
