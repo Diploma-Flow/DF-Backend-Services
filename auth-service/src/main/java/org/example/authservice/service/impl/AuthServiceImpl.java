@@ -9,9 +9,11 @@ import org.example.authservice.request.inbound.RegisterRequest;
 import org.example.authservice.request.outbound.SaveUserRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
+import org.example.authservice.response.TokenData;
 import org.example.authservice.service.AuthService;
 import org.example.authservice.service.JwtService;
 import org.example.authservice.service.TokenService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public AuthenticationResponse register(RegisterRequest request) {
+    public AuthenticationResponse<TokenData> register(RegisterRequest request) {
         SaveUserRequest saveUserRequest = SaveUserRequest
                 .builder()
                 .email(request.getEmail())
@@ -51,9 +53,23 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(savedUser);
-        tokenService.persist(savedUser, jwtTokens);
 
-        return AuthenticationResponse.builder().accessToken(jwtTokens.get(TokenType.ACCESS)).refreshToken(jwtTokens.get(TokenType.REFRESH)).build();
+        try {
+            tokenService.persist(savedUser, jwtTokens);
+
+        } catch (DataIntegrityViolationException e) {
+            //log the error
+            return AuthenticationResponse.<TokenData>builder()
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .response("Registration failed: " + e.getMessage())
+                    .build();
+        }
+
+        return AuthenticationResponse.<TokenData>builder()
+                .httpStatus(HttpStatus.OK)
+                .data(TokenData.builder().accessToken(jwtTokens.get(TokenType.ACCESS)).refreshToken(jwtTokens.get(TokenType.REFRESH)).build())
+                .response("Registration successful")
+                .build();
     }
 
     @Override

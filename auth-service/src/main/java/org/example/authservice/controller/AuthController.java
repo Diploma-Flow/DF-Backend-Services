@@ -6,6 +6,7 @@ import org.example.authservice.request.inbound.LoginRequest;
 import org.example.authservice.request.inbound.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
+import org.example.authservice.response.TokenData;
 import org.example.authservice.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +26,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthenticationResponse<TokenData>> register(@RequestBody RegisterRequest request) {
         final String methodName = "register";
         log.entering(SOURCE_CLASS, methodName);
 
-        AuthenticationResponse authenticationResponse = authService.register(request);
-        return ResponseEntity.ok(authenticationResponse);
+        AuthenticationResponse<TokenData> authenticationResponse = authService.register(request);
+        return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
     }
 
     @PostMapping("/login")

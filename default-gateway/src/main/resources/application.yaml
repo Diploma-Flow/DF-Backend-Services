@@ -33,3 +33,4 @@ auth-service:
 public:
   routes:
   - /auth/**
+  - /eureka/**
