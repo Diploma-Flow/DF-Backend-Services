@@ -1,14 +1,9 @@
-package org.example.userservice.user.account.data.entity;
+package org.example.userservice.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.example.userservice.user.details.data.entity.UserDetails;
-import org.example.userservice.user.details.data.enums.UserRole;
-import org.example.userservice.user.shared.BaseEntity;
+import lombok.*;
+import org.example.userservice.enums.UserRole;
 
 /**
  * Author: Simeon Popov
@@ -19,7 +14,8 @@ import org.example.userservice.user.shared.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Builder
+@Entity(name = "UserAccountEntity")
 @Table(name = "user_account")
 public class UserAccount extends BaseEntity {
 

@@ -1,4 +1,4 @@
-package org.example.userservice.user.details.data.enums;
+package org.example.userservice.enums;
 
 /**
  * Author: Simeon Popov

@@ -1,4 +1,4 @@
-package org.example.userservice.user.shared;
+package org.example.userservice.model;
 
 import jakarta.persistence.*;
 import lombok.*;

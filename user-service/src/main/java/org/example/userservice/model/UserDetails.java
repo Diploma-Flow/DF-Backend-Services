@@ -1,17 +1,12 @@
-package org.example.userservice.user.details.data.entity;
+package org.example.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.example.userservice.user.account.data.entity.UserAccount;
-import org.example.userservice.user.details.data.enums.UserGender;
-import org.example.userservice.user.shared.BaseEntity;
+import lombok.*;
+import org.example.userservice.enums.UserGender;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +18,8 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Builder
+@Entity(name = "UserDetailsEntity")
 @Table(name = "user_details")
 public class UserDetails extends BaseEntity {
 
