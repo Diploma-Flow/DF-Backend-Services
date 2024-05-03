@@ -11,4 +11,5 @@ import java.util.Map;
  */
 public interface TokenService {
     void persist(User owner, Map<TokenType, String> jwtTokens);
+    void updateTokens(String userEmail, Map<TokenType, String> jwtTokens);
 }

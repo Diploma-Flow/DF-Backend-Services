@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
 
         try {
-            tokenService.persist(user, jwtTokens);
+            tokenService.updateTokens(user.getEmail(), jwtTokens);
 
         } catch (DataIntegrityViolationException e) {
             //log the error

@@ -9,6 +9,7 @@ import org.example.authservice.repository.UserTokensRepository;
 import org.example.authservice.service.TokenService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,9 +29,29 @@ public class TokenServiceImpl implements TokenService {
 
         UserTokens userTokens = new UserTokens();
         userTokens.setOwnerEmail(owner.getEmail());
-        userTokens.setAccessToken(accessToken);
+        userTokens.setAccessTokens(List.of(accessToken));
         userTokens.setRefreshToken(refreshToken);
 
         userTokensRepository.save(userTokens);
+    }
+
+    @Override
+    public void updateTokens(String userEmail, Map<TokenType, String> jwtTokens) {
+        UserTokens userTokens = userTokensRepository.findByOwnerEmail(userEmail);
+
+        Token accessToken = new Token(TokenType.ACCESS, jwtTokens.get(TokenType.ACCESS), false);
+        Token refreshToken = new Token(TokenType.REFRESH, jwtTokens.get(TokenType.REFRESH), false);
+
+        if (userTokens != null) {
+            List<Token> accessTokens = userTokens.getAccessTokens();
+
+            if(accessTokens != null && !accessTokens.contains(accessToken)) {
+                accessTokens.add(accessToken);
+            }
+
+            userTokens.setAccessTokens(accessTokens);
+            userTokens.setRefreshToken(refreshToken);
+            userTokensRepository.save(userTokens);
+        }
     }
 }

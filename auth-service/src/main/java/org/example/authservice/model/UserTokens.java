@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 /**
  * Author: Simeon Popov
  * Date of creation: 11.1.2024 г.
@@ -25,6 +27,6 @@ public class UserTokens {
     @Indexed(unique = true)
     private String ownerEmail;
 
-    private Token accessToken;
+    private List<Token> accessTokens;
     private Token refreshToken;
 }
