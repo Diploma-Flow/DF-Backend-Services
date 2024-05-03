@@ -34,7 +34,7 @@ public class UserDetails extends BaseEntity {
     @Size(max = 255, message = "Last name cannot exceed 255 characters")
     private String lastName;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private UserGender gender;
 
     @Past(message = "Date of birth must be in the past")

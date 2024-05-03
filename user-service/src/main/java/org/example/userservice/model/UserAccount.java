@@ -34,7 +34,7 @@ public class UserAccount extends BaseEntity {
     @Column(unique = true)
     private String email;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @NotNull(message = "Role cannot be null")
     private UserRole role;
 
