@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
                 .<User>builder()
                 .httpStatus(HttpStatus.OK)
                 .response("Saved successfully")
-                .data(new User(savedUserAccount.getEmail(), savedUserAccount.getRole(), ""))
+                .user(new User(savedUserAccount.getEmail(), savedUserAccount.getRole(), ""))
                 .build();
     }
 
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
                 .<User>builder()
                 .httpStatus(HttpStatus.OK)
                 .response("Found successfully")
-                .data(new User(user.getEmail(), user.getRole(), user.getPassword()))
+                .user(new User(user.getEmail(), user.getRole(), user.getPassword()))
                 .build();
     }
 

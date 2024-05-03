@@ -16,5 +16,5 @@ import org.springframework.http.HttpStatus;
 public class LoginResponse<T> {
     private String response;
     private HttpStatus httpStatus;
-    private T data;
+    private T user;
 }

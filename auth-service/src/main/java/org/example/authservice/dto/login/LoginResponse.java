@@ -3,6 +3,7 @@ package org.example.authservice.dto.login;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.example.authservice.data.entity.User;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -16,5 +17,5 @@ import org.springframework.http.HttpStatus;
 public class LoginResponse {
     private String response;
     private HttpStatus httpStatus;
-    private Object data;
+    private User user;
 }

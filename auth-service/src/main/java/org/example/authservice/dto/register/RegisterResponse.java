@@ -3,6 +3,7 @@ package org.example.authservice.dto.register;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.example.authservice.data.entity.User;
 import org.example.authservice.data.enums.UserRole;
 import org.springframework.http.HttpStatus;
 
@@ -17,5 +18,5 @@ import org.springframework.http.HttpStatus;
 public class RegisterResponse {
     private String response;
     private HttpStatus httpStatus;
-    private Object data;
+    private User user;
 }
