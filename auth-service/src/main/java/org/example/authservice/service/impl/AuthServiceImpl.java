@@ -46,8 +46,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthenticationResponse<TokenData> register(RegisterRequest request) {
 
-        RegisterResponse<User> userRegisterResponse = userService.registerUser(request);
-        User user = userRegisterResponse.getData();
+        RegisterResponse userRegisterResponse = userService.registerUser(request);
+        User user = (User) userRegisterResponse.getData();
 
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
 
@@ -65,8 +65,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthenticationResponse<TokenData> login(LoginRequest request) {
 
-        LoginResponse<User> userLoginResponse = userService.loginUser(request);
-        User user = userLoginResponse.getData();
+        LoginResponse userLoginResponse = userService.loginUser(request);
+        User user = (User) userLoginResponse.getData();
 
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return buildAuthResponseError(HttpStatus.UNAUTHORIZED, "Invalid email or password");

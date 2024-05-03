@@ -12,6 +12,6 @@ import org.example.authservice.dto.register.RegisterUserRequest;
  * Date of creation: 2.5.2024 г.
  */
 public interface UserService {
-    RegisterResponse<User> registerUser(RegisterRequest request);
-    LoginResponse<User> loginUser(LoginRequest request);
+    RegisterResponse registerUser(RegisterRequest request);
+    LoginResponse loginUser(LoginRequest request);
 }

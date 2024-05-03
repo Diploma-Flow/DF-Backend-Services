@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public RegisterResponse<User> registerUser(RegisterRequest request) {
+    public RegisterResponse registerUser(RegisterRequest request) {
         //TODO to use model mapper here
         RegisterUserRequest registerUserRequest = RegisterUserRequest
                 .builder()
@@ -39,10 +39,10 @@ public class UserServiceImpl implements UserService {
                 .build();
 
 
-//        RegisterResponse<User> registerResponse = restTemplate.postForObject("http://user-service/user/register", registerUserRequest, RegisterResponse<User>.class);
+//        RegisterResponse registerResponse = restTemplate.postForObject("http://user-service/user/register", registerUserRequest, RegisterResponse.class);
 
-        RegisterResponse<User> registerResponse = RegisterResponse
-                .<User>builder()
+        RegisterResponse registerResponse = RegisterResponse
+                .builder()
                 .httpStatus(HttpStatus.OK)
                 .response("Saved successfully")
                 .data(new User(request.getEmail(), UserRole.STUDENT, ""))
@@ -52,13 +52,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginResponse<User> loginUser(LoginRequest request) {
+    public LoginResponse loginUser(LoginRequest request) {
 
         //Send request to user-service
         //        User savedUser = restTemplate.postForObject("http://user-service/user/login", loginUserRequest, User.class);
 
-        LoginResponse<User> loginResponse = LoginResponse
-                .<User>builder()
+        LoginResponse loginResponse = LoginResponse
+                .builder()
                 .httpStatus(HttpStatus.OK)
                 .response("Found successfully")
                 .data(new User(request.getEmail(), UserRole.STUDENT, passwordEncoder.encode(request.getPassword())))

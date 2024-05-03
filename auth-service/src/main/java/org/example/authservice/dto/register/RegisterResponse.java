@@ -14,8 +14,8 @@ import org.springframework.http.HttpStatus;
 @Data
 @Builder
 @AllArgsConstructor
-public class RegisterResponse<T> {
+public class RegisterResponse {
     private String response;
     private HttpStatus httpStatus;
-    private T data;
+    private Object data;
 }
