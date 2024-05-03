@@ -41,8 +41,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    //FIXME make two object RegisteredUser and LoggedInUser
-
     @Override
     public AuthenticationResponse<TokenData> register(RegisterRequest request) {
 
