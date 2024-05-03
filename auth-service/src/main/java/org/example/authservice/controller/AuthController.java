@@ -43,6 +43,7 @@ public class AuthController {
         return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
     }
 
+    //TODO
     @PostMapping("/validate")
     public ResponseEntity<JwtValidationResponse> validate(@RequestBody String jwtToken){
         final String methodName = "validate";
@@ -50,5 +51,17 @@ public class AuthController {
 
         JwtValidationResponse jwtValidationResponse = authService.validate(jwtToken);
         return ResponseEntity.status(jwtValidationResponse.getHttpStatus()).body(jwtValidationResponse);
+    }
+
+    //TODO
+    @PostMapping("/logout")
+    public ResponseEntity<JwtValidationResponse> logout(@RequestBody String jwtToken){
+        return null;
+    }
+
+    //TODO
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtValidationResponse> refresh(@RequestBody String jwtToken){
+        return null;
     }
 }
