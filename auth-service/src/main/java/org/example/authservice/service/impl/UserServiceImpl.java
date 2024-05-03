@@ -40,32 +40,13 @@ public class UserServiceImpl implements UserService {
 
 
         RegisterResponse registerResponse = restTemplate.postForObject("lb://user-service/user/register", registerUserRequest, RegisterResponse.class);
-
-//        RegisterResponse registerResponse = RegisterResponse
-//                .builder()
-//                .httpStatus(HttpStatus.OK)
-//                .response("Saved successfully")
-//                .data(new User(request.getEmail(), UserRole.STUDENT, ""))
-//                .build();
-
         return registerResponse;
     }
 
     @Override
     public LoginResponse loginUser(LoginRequest request) {
 
-        //Send request to user-service
-        //        User savedUser = restTemplate.postForObject("http://user-service/user/login", loginUserRequest, User.class);
-
         LoginResponse loginResponse = restTemplate.postForObject("lb://user-service/user/login", request, LoginResponse.class);
-
-//        LoginResponse loginResponse = LoginResponse
-//                .builder()
-//                .httpStatus(HttpStatus.OK)
-//                .response("Found successfully")
-//                .data(new User(request.getEmail(), UserRole.STUDENT, passwordEncoder.encode(request.getPassword())))
-//                .build();
-
         return loginResponse;
     }
 }

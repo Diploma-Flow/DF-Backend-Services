@@ -12,6 +12,6 @@ import org.example.userservice.dto.register.RegisterUserRequest;
  */
 public interface UserService {
 
-    RegisterUserResponse<User> register (RegisterUserRequest registerUserRequest);
-    LoginResponse<User> loginUser(LoginRequest request);
+    RegisterUserResponse register (RegisterUserRequest registerUserRequest);
+    LoginResponse loginUser(LoginRequest request);
 }

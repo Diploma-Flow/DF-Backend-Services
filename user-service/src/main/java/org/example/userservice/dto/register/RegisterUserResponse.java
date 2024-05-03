@@ -1,8 +1,10 @@
 package org.example.userservice.dto.register;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.example.userservice.dto.User;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -13,8 +15,9 @@ import org.springframework.http.HttpStatus;
 @Data
 @Builder
 @AllArgsConstructor
-public class RegisterUserResponse<T> {
+@JsonInclude(value= JsonInclude.Include.NON_EMPTY, content= JsonInclude.Include.NON_NULL)
+public class RegisterUserResponse {
     private String response;
     private HttpStatus httpStatus;
-    private T user;
+    private User user;
 }

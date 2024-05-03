@@ -1,5 +1,6 @@
 package org.example.userservice.service.impl;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.example.userservice.dto.User;
 import org.example.userservice.dto.login.LoginRequest;
@@ -15,6 +16,7 @@ import org.example.userservice.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 /**
@@ -28,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserAccountRepository userAccountRepository;
 
     @Override
-    public RegisterUserResponse<User> register(RegisterUserRequest registerUserRequest) {
+    public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
         UserDetails userDetails = UserDetails.builder()
                 .firstName(registerUserRequest.getFirstName())
                 .lastName(registerUserRequest.getLastName())
@@ -42,10 +44,20 @@ public class UserServiceImpl implements UserService {
                 .userDetails(userDetails)
                 .build();
 
-        UserAccount savedUserAccount = userAccountRepository.save(userAccount);
+        UserAccount savedUserAccount;
+
+        try {
+            savedUserAccount = userAccountRepository.save(userAccount);
+        }catch (RuntimeException e){
+            return RegisterUserResponse
+                    .builder()
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .response("registration failed because of: " + e.getMessage())
+                    .build();
+        }
 
         return RegisterUserResponse
-                .<User>builder()
+                .builder()
                 .httpStatus(HttpStatus.OK)
                 .response("Saved successfully")
                 .user(new User(savedUserAccount.getEmail(), savedUserAccount.getRole(), ""))
@@ -53,23 +65,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginResponse<User> loginUser(LoginRequest request) {
+    public LoginResponse loginUser(LoginRequest request) {
         Optional<UserAccount> optionalUserAccount = userAccountRepository.findByEmail(request
                 .getEmail()
                 .toLowerCase());
 
         if(optionalUserAccount.isEmpty()){
             return  LoginResponse
-                    .<User>builder()
+                    .builder()
                     .httpStatus(HttpStatus.BAD_REQUEST)
-                    .response("Not found")
+                    .response("Invalid email or password")
                     .build();
         }
 
         UserAccount user = optionalUserAccount.get();
 
         return LoginResponse
-                .<User>builder()
+                .builder()
                 .httpStatus(HttpStatus.OK)
                 .response("Found successfully")
                 .user(new User(user.getEmail(), user.getRole(), user.getPassword()))

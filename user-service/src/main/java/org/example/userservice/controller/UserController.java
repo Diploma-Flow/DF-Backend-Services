@@ -27,20 +27,20 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public RegisterUserResponse<User> register(@RequestBody RegisterUserRequest registerUserRequest) {
+    public RegisterUserResponse register(@RequestBody RegisterUserRequest registerUserRequest) {
         final String methodName = "register";
         log.entering(SOURCE_CLASS, methodName);
 
-        RegisterUserResponse<User> registerUserResponse = userService.register(registerUserRequest);
+        RegisterUserResponse registerUserResponse = userService.register(registerUserRequest);
         return registerUserResponse;
     }
 
     @PostMapping("/login")
-    public LoginResponse<User> login(@RequestBody LoginRequest loginRequest) {
+    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
         final String methodName = "login";
         log.entering(SOURCE_CLASS, methodName);
 
-        LoginResponse<User> loginResponse = userService.loginUser(loginRequest);
+        LoginResponse loginResponse = userService.loginUser(loginRequest);
         return loginResponse;
     }
 
