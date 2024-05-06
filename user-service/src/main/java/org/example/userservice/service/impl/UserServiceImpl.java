@@ -73,8 +73,8 @@ public class UserServiceImpl implements UserService {
         if(optionalUserAccount.isEmpty()){
             return  LoginResponse
                     .builder()
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .response("Invalid email or password")
+                    .httpStatus(HttpStatus.NOT_FOUND)
+                    .response("User with such email not found")
                     .build();
         }
 

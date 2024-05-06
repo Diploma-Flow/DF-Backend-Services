@@ -1,6 +1,7 @@
 package org.example.authservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
 import org.example.authservice.data.enums.UserRole;
@@ -32,6 +33,7 @@ import static org.example.authservice.util.AuthenticationResponseUtil.buildAuthR
  * Date of creation: 11.1.2024 г.
  */
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -68,11 +70,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse<TokenData> login(LoginRequest request) {
-
+        log.info("Sending login request to user-service");
         LoginResponse userLoginResponse = userService.loginUser(request);
-        if(userLoginResponse.getHttpStatus()
+        HttpStatus responseHttpStatus = userLoginResponse.getHttpStatus();
+
+        if(responseHttpStatus
                 .is4xxClientError()){
-            return buildAuthResponseError(userLoginResponse.getHttpStatus(), userLoginResponse.getResponse());
+
+            String responseMessage = userLoginResponse.getResponse();
+            log.info("Login response: \n Status: {} \n Response message: {}", responseHttpStatus, responseMessage);
+
+            return buildAuthResponseError(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
         User user = userLoginResponse.getUser();

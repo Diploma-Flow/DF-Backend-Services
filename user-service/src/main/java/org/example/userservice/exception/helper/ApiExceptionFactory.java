@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 public class ApiExceptionFactory {
     public ApiException generateApiException(Exception e, HttpStatus httpStatus) {
         return ApiException.builder()
-                .message(e.getMessage())
+                .response(e.getMessage())
                 .httpStatus(httpStatus)
                 .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
                 .build();
