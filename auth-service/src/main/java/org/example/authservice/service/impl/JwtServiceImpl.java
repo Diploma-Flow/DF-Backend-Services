@@ -77,10 +77,12 @@ public class JwtServiceImpl implements JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    @Override
     public String extractEmail(String jsonWebToken) {
         return extractClaim(jsonWebToken, Claims::getSubject);
     }
 
+    @Override
     public <T> T extractClaim(String jsonWebToken, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(jsonWebToken);
         return claimsResolver.apply(claims);
@@ -95,11 +97,12 @@ public class JwtServiceImpl implements JwtService {
                 .getBody();
     }
 
-    public boolean isTokenExpired(String jsonWebToken) {
-        return extractExpiration(jsonWebToken).before(new Date());
-    }
-
     private Date extractExpiration(String jsonWebToken) {
         return extractClaim(jsonWebToken, Claims::getExpiration);
+    }
+
+    @Override
+    public boolean isExpired(String jsonWebToken){
+        return extractExpiration(jsonWebToken).before(new Date());
     }
 }

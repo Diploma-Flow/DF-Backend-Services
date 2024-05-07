@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Author: Simeon Popov
@@ -37,7 +38,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void updateTokens(String userEmail, Map<TokenType, String> jwtTokens) {
-        UserTokens userTokens = userTokensRepository.findByOwnerEmail(userEmail);
+        UserTokens userTokens = userTokensRepository.findByOwnerEmail(userEmail).orElseThrow(RuntimeException::new);
 
         Token accessToken = new Token(TokenType.ACCESS, jwtTokens.get(TokenType.ACCESS), false);
         Token refreshToken = new Token(TokenType.REFRESH, jwtTokens.get(TokenType.REFRESH), false);
@@ -53,5 +54,11 @@ public class TokenServiceImpl implements TokenService {
             userTokens.setRefreshToken(refreshToken);
             userTokensRepository.save(userTokens);
         }
+    }
+
+    @Override
+    public UserTokens getTokens(String userEmail) {
+        Optional<UserTokens> userTokens = userTokensRepository.findByOwnerEmail(userEmail);
+        return userTokens.orElseThrow(RuntimeException::new);
     }
 }

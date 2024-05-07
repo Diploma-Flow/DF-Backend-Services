@@ -10,6 +10,7 @@ import org.example.authservice.dto.register.RegisterRequest;
 import org.example.authservice.dto.login.LoginResponse;
 import org.example.authservice.dto.register.RegisterResponse;
 import org.example.authservice.dto.register.RegisterUserRequest;
+import org.example.authservice.model.UserTokens;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
 import org.example.authservice.response.TokenData;
@@ -106,8 +107,33 @@ public class AuthServiceImpl implements AuthService {
     //THIS is made to send response and status 200 OK and 401 UNAUTHORIZED every other status will be considered as error
     @Override
     public JwtValidationResponse validate(String jwtToken) {
-        //TODO use jwt do decrypt and check if the token is not expired
-        //TODO if token not expired return 200 OK
+
+        if(jwtService.isExpired(jwtToken)){
+            return JwtValidationResponse
+                    .builder()
+                    .response("EXPIRED")
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
+
+        String subjectEmail = jwtService.extractEmail(jwtToken);
+        UserTokens userTokens = tokenService.getTokens(subjectEmail);
+
+        boolean tokenRevoked = userTokens
+                .getAccessTokens()
+                .stream()
+                .anyMatch(t -> t
+                        .getValue()
+                        .equals(jwtToken) && t.isRevoked());
+
+        if(tokenRevoked){
+            return JwtValidationResponse
+                    .builder()
+                    .response("REVOKED TOKEN")
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
+
         return JwtValidationResponse
                 .builder()
                 .response("SUCCESS")

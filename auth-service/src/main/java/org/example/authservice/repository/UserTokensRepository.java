@@ -4,6 +4,8 @@ import org.example.authservice.model.UserTokens;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.Optional;
+
 /**
  * Author: Simeon Popov
  * Date of creation: 11.1.2024 г.
@@ -11,5 +13,5 @@ import org.springframework.data.mongodb.repository.Query;
 public interface UserTokensRepository extends MongoRepository<UserTokens, String> {
 
     @Query("{ 'ownerEmail' : ?0 }")
-    UserTokens findByOwnerEmail(String ownerEmail);
+    Optional<UserTokens> findByOwnerEmail(String ownerEmail);
 }
