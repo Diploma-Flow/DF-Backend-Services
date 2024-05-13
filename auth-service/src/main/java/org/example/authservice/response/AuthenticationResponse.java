@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+import java.time.ZonedDateTime;
+
 /**
  * Author: Simeon Popov
  * Date of creation: 23.1.2024 г.
@@ -21,4 +23,5 @@ public class AuthenticationResponse<T> {
     private String response;
     private HttpStatus httpStatus;
     private T data;
+    private ZonedDateTime timestamp;
 }

@@ -1,22 +1,22 @@
 package org.example.userservice.service.impl;
 
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.example.userservice.dto.User;
 import org.example.userservice.dto.login.LoginRequest;
 import org.example.userservice.dto.login.LoginResponse;
 import org.example.userservice.dto.register.RegisterUserResponse;
 import org.example.userservice.dto.register.RegisterUserRequest;
-import org.example.userservice.enums.UserRole;
 import org.example.userservice.exception.exceptions.UserNotFoundException;
 import org.example.userservice.model.UserAccount;
 import org.example.userservice.model.UserDetails;
 import org.example.userservice.repository.UserAccountRepository;
 import org.example.userservice.service.UserService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
+import javax.print.attribute.standard.Destination;
 import java.util.Optional;
 
 /**
@@ -28,13 +28,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserAccountRepository userAccountRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
-        UserDetails userDetails = UserDetails.builder()
-                .firstName(registerUserRequest.getFirstName())
-                .lastName(registerUserRequest.getLastName())
-                .build();
+        UserDetails userDetails = modelMapper.map(registerUserRequest, UserDetails.class);
 
         UserAccount userAccount = UserAccount.builder()
                 .email(registerUserRequest.getEmail().toLowerCase())
@@ -44,17 +42,7 @@ public class UserServiceImpl implements UserService {
                 .userDetails(userDetails)
                 .build();
 
-        UserAccount savedUserAccount;
-
-        try {
-            savedUserAccount = userAccountRepository.save(userAccount);
-        }catch (RuntimeException e){
-            return RegisterUserResponse
-                    .builder()
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .response("registration failed because of: " + e.getMessage())
-                    .build();
-        }
+        UserAccount savedUserAccount = userAccountRepository.save(userAccount);
 
         return RegisterUserResponse
                 .builder()
@@ -70,15 +58,15 @@ public class UserServiceImpl implements UserService {
                 .getEmail()
                 .toLowerCase());
 
-        if(optionalUserAccount.isEmpty()){
-            return  LoginResponse
-                    .builder()
-                    .httpStatus(HttpStatus.NOT_FOUND)
-                    .response("User with such email not found")
-                    .build();
-        }
+//        if(optionalUserAccount.isEmpty()){
+//            return  LoginResponse
+//                    .builder()
+//                    .httpStatus(HttpStatus.NOT_FOUND)
+//                    .response("User with such email not found")
+//                    .build();
+//        }
 
-        UserAccount user = optionalUserAccount.get();
+        UserAccount user = optionalUserAccount.orElseThrow(UserNotFoundException::new);
 
         return LoginResponse
                 .builder()
@@ -88,7 +76,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    public static String generateUsername(String firstName, String lastName) {
+    private static String generateUsername(String firstName, String lastName) {
         // Concatenate the first and last names
         String combinedName = (firstName + lastName).toLowerCase();
         StringBuilder username = new StringBuilder("@");

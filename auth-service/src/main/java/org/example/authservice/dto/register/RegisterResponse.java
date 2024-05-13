@@ -3,8 +3,9 @@ package org.example.authservice.dto.register;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.example.authservice.data.entity.User;
-import org.example.authservice.data.enums.UserRole;
+import org.example.authservice.dto.Response;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -13,10 +14,7 @@ import org.springframework.http.HttpStatus;
  */
 
 @Data
-@Builder
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class RegisterResponse {
-    private String response;
-    private HttpStatus httpStatus;
-    private User user;
+public class RegisterResponse extends Response {
 }

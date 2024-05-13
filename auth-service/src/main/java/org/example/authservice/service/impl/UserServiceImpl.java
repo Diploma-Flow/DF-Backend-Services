@@ -1,14 +1,19 @@
 package org.example.authservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.authservice.data.entity.User;
 import org.example.authservice.data.enums.UserRole;
 import org.example.authservice.dto.login.LoginRequest;
 import org.example.authservice.dto.login.LoginResponse;
 import org.example.authservice.dto.register.RegisterRequest;
 import org.example.authservice.dto.register.RegisterResponse;
 import org.example.authservice.dto.register.RegisterUserRequest;
+import org.example.authservice.exception.exceptions.UserAlreadyRegisteredException;
+import org.example.authservice.exception.exceptions.UserNotFoundException;
+import org.example.authservice.exception.exceptions.UserServiceInternalServerError;
 import org.example.authservice.service.UserService;
+import org.example.authservice.util.ResponseValidatorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final RestTemplate restTemplate;
     private final PasswordEncoder passwordEncoder;
 
@@ -40,13 +46,25 @@ public class UserServiceImpl implements UserService {
 
 
         RegisterResponse registerResponse = restTemplate.postForObject("lb://user-service/user/register", registerUserRequest, RegisterResponse.class);
-        return registerResponse;
+
+        return ResponseValidatorUtil
+                .of(registerResponse)
+                .onStatusThrow(HttpStatus.BAD_REQUEST, UserAlreadyRegisteredException::new)
+                .onStatusThrow(HttpStatus.Series.SERVER_ERROR, UserServiceInternalServerError::new)
+                .getOnStatus(HttpStatus.OK)
+                .orElseThrow(UserServiceInternalServerError::new);
     }
 
     @Override
     public LoginResponse loginUser(LoginRequest request) {
 
         LoginResponse loginResponse = restTemplate.postForObject("lb://user-service/user/login", request, LoginResponse.class);
-        return loginResponse;
+
+        return ResponseValidatorUtil
+                .of(loginResponse)
+                .onStatusThrow(HttpStatus.NOT_FOUND, UserNotFoundException::new)
+                .onStatusThrow(HttpStatus.Series.SERVER_ERROR, UserServiceInternalServerError::new)
+                .getOnStatus(HttpStatus.OK)
+                .orElseThrow(UserServiceInternalServerError::new);
     }
 }

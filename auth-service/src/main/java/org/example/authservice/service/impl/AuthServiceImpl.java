@@ -2,6 +2,7 @@ package org.example.authservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.example.authservice.data.Token;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
 import org.example.authservice.data.enums.UserRole;
@@ -10,6 +11,7 @@ import org.example.authservice.dto.register.RegisterRequest;
 import org.example.authservice.dto.login.LoginResponse;
 import org.example.authservice.dto.register.RegisterResponse;
 import org.example.authservice.dto.register.RegisterUserRequest;
+import org.example.authservice.exception.exceptions.InvalidLoginCredentialsException;
 import org.example.authservice.model.UserTokens;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
@@ -24,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.example.authservice.util.AuthenticationResponseUtil.buildAuthResponseError;
@@ -48,12 +51,6 @@ public class AuthServiceImpl implements AuthService {
     public AuthenticationResponse<TokenData> register(RegisterRequest request) {
 
         RegisterResponse userRegisterResponse = userService.registerUser(request);
-
-        if(userRegisterResponse.getHttpStatus()
-                .is4xxClientError()){
-            return buildAuthResponseError(userRegisterResponse.getHttpStatus(), userRegisterResponse.getResponse());
-        }
-
         User user = userRegisterResponse.getUser();
 
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
@@ -73,21 +70,10 @@ public class AuthServiceImpl implements AuthService {
     public AuthenticationResponse<TokenData> login(LoginRequest request) {
         log.info("Sending login request to user-service");
         LoginResponse userLoginResponse = userService.loginUser(request);
-        HttpStatus responseHttpStatus = userLoginResponse.getHttpStatus();
-
-        if(responseHttpStatus
-                .is4xxClientError()){
-
-            String responseMessage = userLoginResponse.getResponse();
-            log.info("Login response: \n Status: {} \n Response message: {}", responseHttpStatus, responseMessage);
-
-            return buildAuthResponseError(HttpStatus.UNAUTHORIZED, "Invalid email or password");
-        }
-
         User user = userLoginResponse.getUser();
 
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return buildAuthResponseError(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+            throw new InvalidLoginCredentialsException(); //"Invalid password"
         }
 
         // Generate JWT tokens for the retrieved user
@@ -108,6 +94,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public JwtValidationResponse validate(String jwtToken) {
 
+        //isExpired throws an error then is expired
         if(jwtService.isExpired(jwtToken)){
             return JwtValidationResponse
                     .builder()
@@ -119,8 +106,18 @@ public class AuthServiceImpl implements AuthService {
         String subjectEmail = jwtService.extractEmail(jwtToken);
         UserTokens userTokens = tokenService.getTokens(subjectEmail);
 
-        boolean tokenRevoked = userTokens
-                .getAccessTokens()
+        List<Token> accessTokens = userTokens
+                .getAccessTokens();
+
+        if(accessTokens.isEmpty()){
+            return JwtValidationResponse
+                    .builder()
+                    .response("NO ACCESS TOKEN FOUND FOR USER: " + subjectEmail)
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
+
+        boolean tokenRevoked = accessTokens
                 .stream()
                 .anyMatch(t -> t
                         .getValue()

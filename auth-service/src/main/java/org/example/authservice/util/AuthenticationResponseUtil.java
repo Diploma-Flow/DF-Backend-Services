@@ -5,6 +5,8 @@ import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.TokenData;
 import org.springframework.http.HttpStatus;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 /**
@@ -17,6 +19,7 @@ public class AuthenticationResponseUtil {
                 .<TokenData>builder()
                 .httpStatus(httpStatus)
                 .response(message)
+                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
                 .build();
     }
 
@@ -30,6 +33,7 @@ public class AuthenticationResponseUtil {
                         .refreshToken(jwtTokens.get(TokenType.REFRESH))
                         .build())
                 .response(message)
+                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
                 .build();
     }
 }
