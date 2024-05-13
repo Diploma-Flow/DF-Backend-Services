@@ -39,5 +39,9 @@ application:
         expiration: 604800000
 
 user-service:
-  validation:
-    url: 'lb://auth-service/auth/validate'
+  health-check:
+    url: 'lb://user-service/user/health-check'
+    delay: 60000
+  url:
+    login: 'lb://user-service/user/login'
+    register: 'lb://user-service/user/register'

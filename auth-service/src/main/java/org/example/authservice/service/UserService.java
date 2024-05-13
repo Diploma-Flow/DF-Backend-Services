@@ -14,4 +14,5 @@ import org.example.authservice.dto.register.RegisterUserRequest;
 public interface UserService {
     RegisterResponse registerUser(RegisterRequest request);
     LoginResponse loginUser(LoginRequest request);
+    void pingUserService();
 }

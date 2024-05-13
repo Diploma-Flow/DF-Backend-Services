@@ -12,6 +12,7 @@ import org.example.authservice.exception.exceptions.UserNotFoundException;
 import org.example.authservice.exception.exceptions.UserServiceInternalServerError;
 import org.example.authservice.service.UserService;
 import org.example.authservice.util.ResponseValidatorUtil;
+import org.example.authservice.util.ServiceProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final RestTemplate restTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final ServiceProperties serviceProperties;
 
     @Override
     public RegisterResponse registerUser(RegisterRequest request) {
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
 
-        RegisterResponse registerResponse = restTemplate.postForObject("lb://user-service/user/register", registerUserRequest, RegisterResponse.class);
+        RegisterResponse registerResponse = restTemplate.postForObject(serviceProperties.getUSER_SERVICE_REGISTER_URL(), registerUserRequest, RegisterResponse.class);
 
         return ResponseValidatorUtil
                 .of(registerResponse)
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public LoginResponse loginUser(LoginRequest request) {
 
-        LoginResponse loginResponse = restTemplate.postForObject("lb://user-service/user/login", request, LoginResponse.class);
+        LoginResponse loginResponse = restTemplate.postForObject(serviceProperties.getUSER_SERVICE_LOGIN_URL(), request, LoginResponse.class);
 
         return ResponseValidatorUtil
                 .of(loginResponse)
@@ -66,5 +68,19 @@ public class UserServiceImpl implements UserService {
                 .onStatusThrow(HttpStatus.Series.SERVER_ERROR, UserServiceInternalServerError::new)
                 .getOnStatus(HttpStatus.OK)
                 .orElseThrow(UserServiceInternalServerError::new);
+    }
+
+    @Override
+    public void pingUserService() {
+        try {
+            restTemplate.getForObject(serviceProperties.getUSER_SERVICE_HEALTH_CHECK_URL(), String.class);
+            System.out.println("user-service is up and running");
+            System.out.println("CONNECTED TO USER_SERVICES");
+
+        } catch (Exception e) {
+            // If user-service is not available, take appropriate action (e.g., log and prevent auth-service startup)
+            System.err.println("user-service is not available: " + e.getMessage());
+            System.exit(1); // Exit application or throw exception to prevent startup
+        }
     }
 }

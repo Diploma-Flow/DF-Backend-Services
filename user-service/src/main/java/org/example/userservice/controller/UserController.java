@@ -9,10 +9,7 @@ import org.example.userservice.dto.register.RegisterUserResponse;
 import org.example.userservice.dto.register.RegisterUserRequest;
 import org.example.userservice.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Author: Simeon Popov
@@ -43,6 +40,14 @@ public class UserController {
 
         LoginResponse loginResponse = userService.loginUser(loginRequest);
         return loginResponse;
+    }
+
+    @GetMapping("/health-check")
+    public String healthCheck() {
+        final String methodName = "healthCheck";
+        log.entering(SOURCE_CLASS, methodName);
+
+        return "READY";
     }
 
 }
