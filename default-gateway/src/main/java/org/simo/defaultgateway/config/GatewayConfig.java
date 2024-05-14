@@ -1,7 +1,12 @@
 package org.simo.defaultgateway.config;
 
 import lombok.RequiredArgsConstructor;
+import org.simo.defaultgateway.exception.AuthenticationException;
 import org.simo.defaultgateway.filters.CustomGlobalFilter;
+import org.simo.defaultgateway.validators.AuthValidator;
+import org.simo.defaultgateway.validators.impl.AuthHeaderValidator;
+import org.simo.defaultgateway.validators.impl.BearerValidator;
+import org.simo.defaultgateway.validators.impl.JwtFormatValidator;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
@@ -28,5 +33,12 @@ public class GatewayConfig {
     @LoadBalanced
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder();
+    }
+
+    @Bean
+    public AuthValidator authValidator() throws AuthenticationException {
+        return new AuthHeaderValidator()
+                .andThen(new BearerValidator())
+                .andThen(new JwtFormatValidator());
     }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.simo.defaultgateway.exception.AuthenticationException;
 import org.simo.defaultgateway.response.JwtValidationResponse;
+import org.simo.defaultgateway.validators.AuthValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,6 +12,8 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 /**
  * Author: Simeon Popov
@@ -22,54 +25,28 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class JwtValidatorService {
 
-    public static final String BEARER_PREFIX = "Bearer ";
-    private static final String JWT_VALIDATION_REGEX = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_.+/=]*$";
+    public static final int JWT_BEGINNING_INDEX = 7;
     private final WebClient.Builder webClientBuilder;
+    private final AuthValidator validationChain;
+
     @Value("${auth-service.validation.url}")
     private String AUTH_SERVICE_VALIDATION_URL;
 
-    public void validateAuth(ServerHttpRequest request) {
-        boolean containsAuthHeader = request
-                .getHeaders()
-                .containsKey(HttpHeaders.AUTHORIZATION);
-
-        if (!containsAuthHeader) {
-            throw new AuthenticationException("Authorization header is missing in request");
-        }
-    }
-
-    public void validateAuthHeader(ServerHttpRequest request) {
+    public void validateAuthorizationHeader(ServerHttpRequest request) throws AuthenticationException {
         String authHeader = getAuthHeader(request);
-
-        if (authHeader.isBlank()) {
-            throw new AuthenticationException("Authorization header is empty");
-        }
+        validationChain.validate(authHeader);
     }
 
-    public String getAuthHeader(ServerHttpRequest request) {
-        return request
-                .getHeaders()
-                .getFirst(HttpHeaders.AUTHORIZATION);
-    }
-
-    public void validateBearer(ServerHttpRequest request) {
-        String authHeader = getAuthHeader(request);
-
-        if (!authHeader.startsWith(BEARER_PREFIX)) {
-            throw new AuthenticationException("Bearer token is missing");
-        }
-    }
-
-    public void validateJwtFormat(ServerHttpRequest request) {
-        String token = getAuthHeader(request).substring(7);
-
-        if (token.isBlank() || !token.matches(JWT_VALIDATION_REGEX)) {
-            throw new AuthenticationException("JWT format is NOT valid");
-        }
+    private String getAuthHeader(ServerHttpRequest request) {
+        return Optional
+                .ofNullable(request
+                        .getHeaders()
+                        .getFirst(HttpHeaders.AUTHORIZATION))
+                .orElseThrow(() -> new AuthenticationException("Authorization header is missing in request"));
     }
 
     public Mono<JwtValidationResponse> isJwtValid(ServerHttpRequest request) {
-        String token = getAuthHeader(request).substring(7);
+        String token = getAuthHeader(request).substring(JWT_BEGINNING_INDEX);
 
         return webClientBuilder
                 .build()

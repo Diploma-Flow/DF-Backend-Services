@@ -36,10 +36,7 @@ public class JwtValidationGatewayFilterFactory implements GatewayFilter {
         ServerHttpRequest request = exchange.getRequest();
 
         try {
-            jwtValidatorService.validateAuth(request);
-            jwtValidatorService.validateAuthHeader(request);
-            jwtValidatorService.validateBearer(request);
-            jwtValidatorService.validateJwtFormat(request);
+            jwtValidatorService.validateAuthorizationHeader(request);
 
         } catch (AuthenticationException e) {
             log.warn(e.getMessage());

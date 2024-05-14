@@ -91,6 +91,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     //THIS is made to send response and status 200 OK and 401 UNAUTHORIZED every other status will be considered as error
+    //TODO check if the token is access and not refresh
     @Override
     public JwtValidationResponse validate(String jwtToken) {
 
