@@ -40,6 +40,7 @@ application:
 
 user-service:
   health-check:
+    enabled: false
     url: 'lb://user-service/user/health-check'
     delay: 60000
   url:

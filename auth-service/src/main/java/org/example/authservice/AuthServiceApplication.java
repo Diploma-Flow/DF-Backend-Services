@@ -13,16 +13,9 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableMongoRepositories
-@RequiredArgsConstructor
 public class AuthServiceApplication {
-    private final UserService userService;
 
     public static void main(String[] args) {
         SpringApplication.run(AuthServiceApplication.class, args);
-    }
-
-    @Scheduled(fixedRateString = "${user-service.health-check.delay}")
-    public void pingUserService() {
-        userService.pingUserService();
     }
 }
