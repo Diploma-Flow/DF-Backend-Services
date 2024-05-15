@@ -2,7 +2,7 @@ package org.simo.defaultgateway.filters;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.simo.defaultgateway.exception.AuthenticationException;
+import org.simo.defaultgateway.exception.HeaderValidationException;
 import org.simo.defaultgateway.response.JwtValidationResponse;
 import org.simo.defaultgateway.service.JwtValidatorService;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -38,7 +38,7 @@ public class JwtValidationGatewayFilterFactory implements GatewayFilter {
         try {
             jwtValidatorService.validateAuthorizationHeader(request);
 
-        } catch (AuthenticationException e) {
+        } catch (HeaderValidationException e) {
             log.warn(e.getMessage());
             return onError(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
         }

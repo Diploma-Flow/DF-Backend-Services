@@ -6,14 +6,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.simo.defaultgateway.exception.AuthenticationException;
-import org.simo.defaultgateway.validators.AuthValidator;
-import org.simo.defaultgateway.validators.impl.AuthHeaderValidator;
-import org.simo.defaultgateway.validators.impl.BearerValidator;
-import org.simo.defaultgateway.validators.impl.JwtFormatValidator;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.simo.defaultgateway.response.JwtValidationResponse;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ClientHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,18 +39,36 @@ class JwtValidatorServiceTest {
     @Mock
     private HttpHeaders mockHeaders;
 
+    @Mock
+    private WebClient mockWebClient;
+
+    @Mock
+    private WebClient.RequestHeadersSpec<?> mockRequestHeadersSpec;
+
+    @Mock
+    private WebClient.ResponseSpec mockResponseSpec;
+
+//    @InjectMocks
+//    private JwtValidatorService jwtValidatorService;
+//
+//    @Mock
+//    private ServerHttpRequest mockRequest;
+//
+//    @Mock
+//    private HttpHeaders mockHeaders;
+
 //    @Nested
 //    @DisplayName("validateAuthorizationHeader method tests")
 //    class ValidateAuthorizationHeaderTests {
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header is missing")
+//        @DisplayName("should throw HeaderValidationException when Authorization header is missing")
 //        public void testValidateAuthorizationHeader_MissingAuthorizationHeader() {
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn(null);
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateAuthorizationHeader(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Authorization header is missing in request", exception.getMessage());
 //
@@ -55,13 +77,13 @@ class JwtValidatorServiceTest {
 //        }
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header is blank")
+//        @DisplayName("should throw HeaderValidationException when Authorization header is blank")
 //        public void testValidateAuthorizationHeader_AuthorizationHeaderBlank() {
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn("");
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateAuthorizationHeader(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Authorization header is empty", exception.getMessage());
 //
@@ -70,13 +92,13 @@ class JwtValidatorServiceTest {
 //        }
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header does not start with BEARER_PREFIX")
+//        @DisplayName("should throw HeaderValidationException when Authorization header does not start with BEARER_PREFIX")
 //        public void testValidateAuthorizationHeader_AuthorizationHeader_WithoutBearerPrefix() {
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn("not bearer prefix");
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateAuthorizationHeader(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Bearer token is missing", exception.getMessage());
 //
@@ -85,13 +107,13 @@ class JwtValidatorServiceTest {
 //        }
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header's jwt token format is not valid")
+//        @DisplayName("should throw HeaderValidationException when Authorization header's jwt token format is not valid")
 //        public void testValidateAuthorizationHeader_AuthorizationHeader_InvalidJwtFormat() {
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn("Bearer ua");
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateAuthorizationHeader(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("JWT format is NOT valid", exception.getMessage());
 //
@@ -100,20 +122,21 @@ class JwtValidatorServiceTest {
 //        }
 //    }
 
+    //===================================================================================================================
 
 //    @Nested
 //    @DisplayName("validateAuth method tests")
 //    class ValidateAuthTests {
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header is missing")
+//        @DisplayName("should throw HeaderValidationException when Authorization header is missing")
 //        public void testValidateAuth_MissingAuthorizationHeader() {
 //            when(mockRequest.getHeaders()).thenReturn(mockHeaders);
 //            when(mockHeaders.containsKey(HttpHeaders.AUTHORIZATION)).thenReturn(false);
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateAuth(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Authorization header is missing in request", exception.getMessage());
 //        }
@@ -139,14 +162,14 @@ class JwtValidatorServiceTest {
 //    class ValidateAuthHeaderTests {
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header is missing in request")
+//        @DisplayName("should throw HeaderValidationException when Authorization header is missing in request")
 //        public void testValidateAuthHeader_MissingAuthorizationHeader() {
 //            when(mockRequest.getHeaders()).thenReturn(mockHeaders);
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn(null);
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateAuthHeader(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Authorization header is empty", exception.getMessage());
 //
@@ -155,14 +178,14 @@ class JwtValidatorServiceTest {
 //        }
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header is found but blank")
+//        @DisplayName("should throw HeaderValidationException when Authorization header is found but blank")
 //        public void testValidateAuthHeader_BlankAuthorizationHeader() {
 //            when(mockRequest.getHeaders()).thenReturn(mockHeaders);
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn("");
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateAuthHeader(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Authorization header is empty", exception.getMessage());
 //
@@ -191,14 +214,14 @@ class JwtValidatorServiceTest {
 //    class ValidateBearerTests {
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header is missing in request")
+//        @DisplayName("should throw HeaderValidationException when Authorization header is missing in request")
 //        public void testValidateBearer_MissingAuthorizationHeader() {
 //            when(mockRequest.getHeaders()).thenReturn(mockHeaders);
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn(null);
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateBearer(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Bearer token is missing", exception.getMessage());
 //
@@ -207,14 +230,14 @@ class JwtValidatorServiceTest {
 //        }
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header is found but does not start with BEARER_PREFIX")
+//        @DisplayName("should throw HeaderValidationException when Authorization header is found but does not start with BEARER_PREFIX")
 //        public void testValidateBearer_MissingBearer_in_AuthorizationHeader() {
 //            when(mockRequest.getHeaders()).thenReturn(mockHeaders);
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn("no bearer");
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateBearer(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Bearer token is missing", exception.getMessage());
 //
@@ -243,14 +266,14 @@ class JwtValidatorServiceTest {
 //    class ValidateJwtFormatTests {
 //
 //        @Test
-//        @DisplayName("should throw AuthenticationException when Authorization header is missing in request")
+//        @DisplayName("should throw HeaderValidationException when Authorization header is missing in request")
 //        public void testValidateBearer_MissingAuthorizationHeader() {
 //            when(mockRequest.getHeaders()).thenReturn(mockHeaders);
 //            when(mockHeaders.getFirst(HttpHeaders.AUTHORIZATION)).thenReturn(null);
 //
-//            AuthenticationException exception = assertThrows(AuthenticationException.class,
+//            HeaderValidationException exception = assertThrows(HeaderValidationException.class,
 //                    () -> jwtValidatorService.validateJwtFormat(mockRequest),
-//                    "Expected AuthenticationException");
+//                    "Expected HeaderValidationException");
 //
 //            assertEquals("Bearer token is missing", exception.getMessage());
 //

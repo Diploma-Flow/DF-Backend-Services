@@ -2,7 +2,7 @@ package org.simo.defaultgateway.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.simo.defaultgateway.exception.AuthenticationException;
+import org.simo.defaultgateway.exception.HeaderValidationException;
 import org.simo.defaultgateway.response.JwtValidationResponse;
 import org.simo.defaultgateway.validators.AuthValidator;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ public class JwtValidatorService {
     @Value("${auth-service.validation.url}")
     private String AUTH_SERVICE_VALIDATION_URL;
 
-    public void validateAuthorizationHeader(ServerHttpRequest request) throws AuthenticationException {
+    public void validateAuthorizationHeader(ServerHttpRequest request) throws HeaderValidationException {
         String authHeader = getAuthHeader(request);
         validationChain.validate(authHeader);
     }
@@ -42,7 +42,7 @@ public class JwtValidatorService {
                 .ofNullable(request
                         .getHeaders()
                         .getFirst(HttpHeaders.AUTHORIZATION))
-                .orElseThrow(() -> new AuthenticationException("Authorization header is missing in request"));
+                .orElseThrow(() -> new HeaderValidationException("Authorization header is missing in request"));
     }
 
     public Mono<JwtValidationResponse> isJwtValid(ServerHttpRequest request) {

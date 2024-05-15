@@ -1,7 +1,6 @@
 package org.simo.defaultgateway.validators;
 
-import org.simo.defaultgateway.exception.AuthenticationException;
-import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.simo.defaultgateway.exception.HeaderValidationException;
 
 /**
  * Author: Simeon Popov
@@ -11,7 +10,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 @FunctionalInterface
 public interface AuthValidator {
 
-    void validate(String authHeader) throws AuthenticationException;
+    void validate(String authHeader) throws HeaderValidationException;
 
     default AuthValidator andThen(AuthValidator next) {
         return request -> {
