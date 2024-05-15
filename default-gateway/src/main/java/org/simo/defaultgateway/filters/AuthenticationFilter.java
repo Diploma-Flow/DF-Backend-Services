@@ -2,8 +2,8 @@ package org.simo.defaultgateway.filters;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.simo.defaultgateway.exception.HeaderValidationException;
 import org.simo.defaultgateway.response.JwtValidationResponse;
+import org.simo.defaultgateway.service.HeaderValidatorService;
 import org.simo.defaultgateway.service.JwtValidatorService;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -25,23 +25,18 @@ import static org.simo.defaultgateway.utils.WebFluxUtils.onError;
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class JwtValidationGatewayFilterFactory implements GatewayFilter {
+public class AuthenticationFilter implements GatewayFilter {
 
+    private final HeaderValidatorService headerValidatorService;
     private final JwtValidatorService jwtValidatorService;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.trace("ENTERING: JwtValidationGatewayFilterFactory");
+        log.trace("ENTERING: AuthenticationFilter");
 
         ServerHttpRequest request = exchange.getRequest();
-
-        try {
-            jwtValidatorService.validateAuthorizationHeader(request);
-
-        } catch (HeaderValidationException e) {
-            log.warn(e.getMessage());
-            return onError(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
-        }
+        String authHeader = HeaderValidatorService.getAuthHeader(request);
+        headerValidatorService.validateAuthHeader(authHeader);
 
         return jwtValidatorService
                 .isJwtValid(request)

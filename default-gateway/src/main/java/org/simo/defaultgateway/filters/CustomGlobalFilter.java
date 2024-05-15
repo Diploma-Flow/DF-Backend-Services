@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CustomGlobalFilter implements GlobalFilter, Ordered {
     private final RouteValidatorService routeValidatorService;
-    private final JwtValidationGatewayFilterFactory jwtValidationGatewayFilterFactory;
+    private final AuthenticationFilter authenticationFilter;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -39,8 +39,8 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        log.info("Request forwarded to header and jwt filters");
-        return jwtValidationGatewayFilterFactory.filter(exchange, chain);
+        log.info("Request forwarded to authentication filter");
+        return authenticationFilter.filter(exchange, chain);
     }
 
     @Override
