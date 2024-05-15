@@ -2,19 +2,13 @@ package org.simo.defaultgateway.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.simo.defaultgateway.exception.HeaderValidationException;
 import org.simo.defaultgateway.response.JwtValidationResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
-import static org.simo.defaultgateway.service.HeaderValidatorService.getAuthHeader;
 
 /**
  * Author: Simeon Popov
@@ -26,16 +20,14 @@ import static org.simo.defaultgateway.service.HeaderValidatorService.getAuthHead
 @RequiredArgsConstructor
 public class JwtValidatorService {
 
-    public static final int JWT_BEGINNING_INDEX = 7;
     private final WebClient.Builder webClientBuilder;
 
     @Value("${auth-service.validation.url}")
     private String AUTH_SERVICE_VALIDATION_URL;
 
-    public Mono<JwtValidationResponse> isJwtValid(ServerHttpRequest request) {
-        String token = getAuthHeader(request).substring(JWT_BEGINNING_INDEX);
+    public Mono<JwtValidationResponse> isJwtValid(String jwtToken) {
 
-        return generateRequestWithBody(token)
+        return generateRequestWithBody(jwtToken)
                 .exchangeToMono(response -> {
                     if (response
                             .statusCode()

@@ -14,33 +14,36 @@ import java.util.Optional;
  */
 
 @Service
-public class HeaderValidatorService {
+public class HeaderService {
     public static final String BEARER_PREFIX = "Bearer ";
     private static final String JWT_VALIDATION_REGEX = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_.+/=]*$";
 
 
-
-    public static String getAuthHeader(ServerHttpRequest request) {
-        return Optional
+    public String getAuthHeader(ServerHttpRequest request) {
+        String authHeader = Optional
                 .ofNullable(request
                         .getHeaders()
                         .getFirst(HttpHeaders.AUTHORIZATION))
                 .orElseThrow(() -> new HeaderValidationException("Authorization header is missing in request"));
-    }
 
-    public void validateAuthHeader(String authHeader) {
         if (StringUtils.isBlank(authHeader)) {
             throw new HeaderValidationException("Authorization header is empty");
         }
 
+        return authHeader;
+    }
+
+    public String getJwtFromHeader(String authHeader) {
         if (!authHeader.startsWith(BEARER_PREFIX)) {
             throw new HeaderValidationException("Bearer token is missing");
         }
 
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(BEARER_PREFIX.length());
 
         if (!token.matches(JWT_VALIDATION_REGEX)) {
             throw new HeaderValidationException("JWT format is NOT valid");
         }
+
+        return token;
     }
 }

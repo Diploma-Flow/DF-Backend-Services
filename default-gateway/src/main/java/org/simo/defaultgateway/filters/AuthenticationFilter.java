@@ -3,7 +3,7 @@ package org.simo.defaultgateway.filters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.simo.defaultgateway.response.JwtValidationResponse;
-import org.simo.defaultgateway.service.HeaderValidatorService;
+import org.simo.defaultgateway.service.HeaderService;
 import org.simo.defaultgateway.service.JwtValidatorService;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -27,7 +27,7 @@ import static org.simo.defaultgateway.utils.WebFluxUtils.onError;
 @RequiredArgsConstructor
 public class AuthenticationFilter implements GatewayFilter {
 
-    private final HeaderValidatorService headerValidatorService;
+    private final HeaderService headerService;
     private final JwtValidatorService jwtValidatorService;
 
     @Override
@@ -35,12 +35,15 @@ public class AuthenticationFilter implements GatewayFilter {
         log.trace("ENTERING: AuthenticationFilter");
 
         ServerHttpRequest request = exchange.getRequest();
-        String authHeader = HeaderValidatorService.getAuthHeader(request);
-        headerValidatorService.validateAuthHeader(authHeader);
+        String authHeader = headerService.getAuthHeader(request);
+        String jwtToken = headerService.getJwtFromHeader(authHeader);
 
-        return jwtValidatorService
-                .isJwtValid(request)
+        Mono<Void> voidMono = jwtValidatorService
+                .isJwtValid(jwtToken)
                 .flatMap(handleJwtValidationResult(exchange, chain));
+
+        return voidMono;
+//        return chain.filter(exchange);
     }
 
     private static Function<JwtValidationResponse, Mono<? extends Void>> handleJwtValidationResult(ServerWebExchange exchange, GatewayFilterChain chain) {
