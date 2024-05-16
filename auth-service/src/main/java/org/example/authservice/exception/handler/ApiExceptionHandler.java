@@ -4,6 +4,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.example.authservice.exception.exceptions.InvalidLoginCredentialsException;
+import org.example.authservice.exception.exceptions.UserLoginException;
+import org.example.authservice.exception.exceptions.UserRegistrationException;
 import org.example.authservice.exception.helper.ApiException;
 import org.example.authservice.exception.helper.ApiExceptionFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,8 +27,8 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
-        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-        ApiException apiException = apiExceptionFactory.generateApiException("Registration failed: " + e.getMessage(), httpStatus);
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);
     }
@@ -55,5 +57,20 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiException, httpStatus);
     }
 
+    @ExceptionHandler(UserRegistrationException.class)
+    public ResponseEntity<Object> handleUserRegistrationException(UserRegistrationException e) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(UserLoginException.class)
+    public ResponseEntity<Object> handleUserLoginException(UserLoginException e) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
 
 }

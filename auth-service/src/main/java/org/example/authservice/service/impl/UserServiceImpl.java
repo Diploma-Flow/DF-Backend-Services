@@ -16,9 +16,15 @@ import org.example.authservice.util.ServiceProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.DefaultResponseErrorHandler;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
 
 /**
  * Author: Simeon Popov
@@ -60,6 +66,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public LoginResponse loginUser(LoginRequest request) {
 
+        //TODO figure out what to do with error when request is returned
         LoginResponse loginResponse = restTemplate.postForObject(serviceProperties.getUSER_SERVICE_LOGIN_URL(), request, LoginResponse.class);
 
         return ResponseValidatorUtil

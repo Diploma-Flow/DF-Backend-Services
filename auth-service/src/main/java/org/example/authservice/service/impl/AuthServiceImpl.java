@@ -12,6 +12,8 @@ import org.example.authservice.dto.login.LoginResponse;
 import org.example.authservice.dto.register.RegisterResponse;
 import org.example.authservice.dto.register.RegisterUserRequest;
 import org.example.authservice.exception.exceptions.InvalidLoginCredentialsException;
+import org.example.authservice.exception.exceptions.UserLoginException;
+import org.example.authservice.exception.exceptions.UserRegistrationException;
 import org.example.authservice.model.UserTokens;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
@@ -49,19 +51,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponse<TokenData> register(RegisterRequest request) {
-
+        log.info("Sending register request to user-service");
         RegisterResponse userRegisterResponse = userService.registerUser(request);
         User user = userRegisterResponse.getUser();
-
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
-
-        try {
-            tokenService.persist(user, jwtTokens);
-
-        } catch (DataIntegrityViolationException e) {
-            //log the error
-            return buildAuthResponseError(HttpStatus.BAD_REQUEST, "Registration failed: " + e.getMessage());
-        }
+        tokenService.persist(user, jwtTokens);
 
         return buildAuthResponseOk(jwtTokens, "Registration successful");
     }
@@ -78,14 +72,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Generate JWT tokens for the retrieved user
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
-
-        try {
-            tokenService.updateTokens(user.getEmail(), jwtTokens);
-
-        } catch (DataIntegrityViolationException e) {
-            //log the error
-            return buildAuthResponseError(HttpStatus.BAD_REQUEST, "Login failed: " + e.getMessage());
-        }
+        tokenService.updateTokens(user.getEmail(), jwtTokens);
 
         return buildAuthResponseOk(jwtTokens, "Login successful");
     }
