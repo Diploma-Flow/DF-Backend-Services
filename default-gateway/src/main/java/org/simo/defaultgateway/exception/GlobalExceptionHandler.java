@@ -19,11 +19,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HeaderValidationException.class)
     public ResponseEntity<String> handleHeaderValidationException(HeaderValidationException e) {
-        return new ResponseEntity<>("HeaderValidationException", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("HeaderValidationException"+e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(JwtValidationException.class)
     public ResponseEntity<String> handleJwtValidationException(JwtValidationException e) {
-        return new ResponseEntity<>("JwtValidationException", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("JwtValidationException"+e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

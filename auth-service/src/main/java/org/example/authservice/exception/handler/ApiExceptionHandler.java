@@ -1,5 +1,7 @@
 package org.example.authservice.exception.handler;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.example.authservice.exception.exceptions.InvalidLoginCredentialsException;
 import org.example.authservice.exception.helper.ApiException;
@@ -31,6 +33,22 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(InvalidLoginCredentialsException.class)
     public ResponseEntity<Object> handleInvalidLoginCredentialsException(InvalidLoginCredentialsException e) {
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<Object> handleSignatureException(SignatureException e) {
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException e) {
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
         ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
 
