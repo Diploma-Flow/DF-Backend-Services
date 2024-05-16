@@ -1,4 +1,4 @@
-package org.simo.defaultgateway.exception;
+package org.simo.defaultgateway.exception.exceptions;
 
 /**
  * Author: Simeon Popov

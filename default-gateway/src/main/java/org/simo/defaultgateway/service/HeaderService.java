@@ -1,7 +1,7 @@
 package org.simo.defaultgateway.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.simo.defaultgateway.exception.HeaderValidationException;
+import org.simo.defaultgateway.exception.exceptions.HeaderValidationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;

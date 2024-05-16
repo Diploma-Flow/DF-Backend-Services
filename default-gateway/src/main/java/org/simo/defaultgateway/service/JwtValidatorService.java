@@ -2,7 +2,7 @@ package org.simo.defaultgateway.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.simo.defaultgateway.exception.JwtValidationException;
+import org.simo.defaultgateway.exception.exceptions.JwtValidationException;
 import org.simo.defaultgateway.response.JwtValidationResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
