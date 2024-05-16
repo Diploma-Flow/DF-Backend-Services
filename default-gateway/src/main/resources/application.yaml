@@ -1,14 +1,6 @@
 spring:
   application:
     name: default-gateway
-#  cloud:
-#    gateway:
-#      routes:
-#        - id: message-service
-#          uri: lb://MESSAGE-SERVICE
-#          predicates:
-#            - Cookie=mycookie,mycookievalue
-#            - Path=/message/**
 
 server:
   port: 8080
