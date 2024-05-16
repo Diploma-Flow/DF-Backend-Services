@@ -1,5 +1,6 @@
 package org.simo.defaultgateway.service;
 
+import jakarta.ws.rs.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.simo.defaultgateway.exception.exceptions.JwtValidationException;
@@ -54,7 +55,7 @@ public class JwtValidatorService {
     private Mono<JwtValidationResponse> sendValidationRequest(WebClient.RequestHeadersSpec<?> request) {
         return request
                 .exchangeToMono(mapResponseToJwtValidationResponse())
-                .onErrorMap(throwable -> new JwtValidationException("Error during JWT validation: " + throwable.getMessage()));
+                .onErrorMap(throwable -> new RuntimeException("Error during JWT validation: " + throwable.getMessage()));
     }
 
     private Function<ClientResponse, Mono<JwtValidationResponse>> mapResponseToJwtValidationResponse() {
@@ -67,7 +68,7 @@ public class JwtValidatorService {
                 return response.bodyToMono(JwtValidationResponse.class);
             }
 
-            throw new JwtValidationException("Unexpected response status from user-service: " + httpStatusCode);
+            throw new RuntimeException("Unexpected response status from user-service: " + httpStatusCode);
         };
     }
 
@@ -80,14 +81,15 @@ public class JwtValidatorService {
                 return chain.filter(exchange);
             }
 
-            if (responseHttpStatus.is4xxClientError()) {
-                String errorMessage = response.getResponse();
-                log.warn(errorMessage);
+            String errorMessage = "Unexpected response status from user-service: " + responseHttpStatus;
 
-                return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
+            if (responseHttpStatus.is4xxClientError()) {
+                errorMessage = response.getResponse();
+                log.warn(errorMessage);
+                throw new JwtValidationException(errorMessage);
             }
 
-            return onError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error");
+            throw new RuntimeException(errorMessage);
         };
     }
 }

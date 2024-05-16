@@ -1,6 +1,8 @@
 package org.simo.defaultgateway.exception.handler;
 
+import jakarta.ws.rs.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.simo.defaultgateway.exception.exceptions.HeaderValidationException;
 import org.simo.defaultgateway.exception.exceptions.JwtValidationException;
 import org.simo.defaultgateway.exception.util.ApiException;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * Date of creation: 5/16/2024
  */
 
+@Log4j2
 @ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
@@ -33,6 +36,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleJwtValidationException(JwtValidationException e) {
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
         ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Object> handleJwtValidationException(RuntimeException e) {
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        log.error(e.getMessage(), e);
+        ApiException apiException = apiExceptionFactory.generateApiException(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);
     }
