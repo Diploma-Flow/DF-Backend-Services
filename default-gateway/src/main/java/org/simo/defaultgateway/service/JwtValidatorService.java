@@ -42,8 +42,18 @@ public class JwtValidatorService {
         return jwtValidationResponseMono;
     }
 
+    private WebClient.RequestHeadersSpec<?> generateRequestWithBody(String token) {
+        return webClientBuilder
+                .build()
+                .post()
+                .uri(AUTH_SERVICE_VALIDATION_URL)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(token);
+    }
+
     private Mono<JwtValidationResponse> sendValidationRequest(WebClient.RequestHeadersSpec<?> request) {
-        return request.exchangeToMono(mapResponseToJwtValidationResponse())
+        return request
+                .exchangeToMono(mapResponseToJwtValidationResponse())
                 .onErrorMap(throwable -> new JwtValidationException("Error during JWT validation: " + throwable.getMessage()));
     }
 
@@ -52,21 +62,13 @@ public class JwtValidatorService {
 
             HttpStatusCode httpStatusCode = response.statusCode();
 
+            //responses with status '4xx' are mapped for later processing the reason of the client error
             if (httpStatusCode.is2xxSuccessful() || httpStatusCode.is4xxClientError()) {
                 return response.bodyToMono(JwtValidationResponse.class);
             }
 
             throw new JwtValidationException("Unexpected response status from user-service: " + httpStatusCode);
         };
-    }
-
-    private WebClient.RequestHeadersSpec<?> generateRequestWithBody(String token) {
-        return webClientBuilder
-                .build()
-                .post()
-                .uri(AUTH_SERVICE_VALIDATION_URL)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(token);
     }
 
     public Function<JwtValidationResponse, Mono<? extends Void>> processValidationResult(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -83,13 +85,6 @@ public class JwtValidatorService {
                 log.warn(errorMessage);
 
                 return onError(exchange, HttpStatus.UNAUTHORIZED, errorMessage);
-            }
-
-            if (responseHttpStatus.is5xxServerError()) {
-                String errorMessage = "Internal server error";
-                log.error(errorMessage);
-
-                return onError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
             }
 
             return onError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error");
