@@ -26,14 +26,20 @@ public class HeaderService {
                         .getFirst(HttpHeaders.AUTHORIZATION))
                 .orElseThrow(() -> new HeaderValidationException("Authorization header is missing in request"));
 
-        if (StringUtils.isBlank(authHeader)) {
-            throw new HeaderValidationException("Authorization header is empty");
-        }
+        validateAuthHeaderNotBlank(authHeader);
 
         return authHeader;
     }
 
+    private static void validateAuthHeaderNotBlank(String authHeader) {
+        if (StringUtils.isBlank(authHeader)) {
+            throw new HeaderValidationException("Authorization header is empty");
+        }
+    }
+
     public String getJwtFromHeader(String authHeader) {
+        validateAuthHeaderNotBlank(authHeader);
+
         if (!authHeader.startsWith(BEARER_PREFIX)) {
             throw new HeaderValidationException("Bearer token is missing");
         }
