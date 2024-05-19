@@ -3,6 +3,7 @@ package org.example.authservice.dto.register;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.example.authservice.data.enums.UserRole;
 
 /**
@@ -12,11 +13,12 @@ import org.example.authservice.data.enums.UserRole;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class RegisterUserRequest {
-    private final String email;
-    private final String password;
-    private final String firstName;
-    private final String lastName;
-    private final UserRole userRole;
+    private String email;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private UserRole userRole;
 }

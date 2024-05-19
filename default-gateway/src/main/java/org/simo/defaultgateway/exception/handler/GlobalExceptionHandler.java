@@ -7,6 +7,7 @@ import org.simo.defaultgateway.exception.exceptions.HeaderValidationException;
 import org.simo.defaultgateway.exception.exceptions.JwtValidationException;
 import org.simo.defaultgateway.exception.util.ApiException;
 import org.simo.defaultgateway.exception.util.ApiExceptionFactory;
+import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,6 +36,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JwtValidationException.class)
     public ResponseEntity<Object> handleJwtValidationException(JwtValidationException e) {
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException e) {
+        HttpStatus httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
         ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);

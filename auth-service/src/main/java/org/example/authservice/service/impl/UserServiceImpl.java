@@ -9,22 +9,22 @@ import org.example.authservice.dto.register.RegisterResponse;
 import org.example.authservice.dto.register.RegisterUserRequest;
 import org.example.authservice.exception.exceptions.UserAlreadyRegisteredException;
 import org.example.authservice.exception.exceptions.UserNotFoundException;
+import org.example.authservice.exception.exceptions.UserServiceConnectionTimeoutException;
 import org.example.authservice.exception.exceptions.UserServiceInternalServerError;
 import org.example.authservice.service.UserService;
-import org.example.authservice.util.ResponseValidatorUtil;
 import org.example.authservice.util.ServiceProperties;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.DefaultResponseErrorHandler;
-import org.springframework.web.client.ResponseErrorHandler;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
-import java.io.IOException;
+import java.util.function.Predicate;
 
 /**
  * Author: Simeon Popov
@@ -36,58 +36,107 @@ import java.io.IOException;
 public class UserServiceImpl implements UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
-    private final RestTemplate restTemplate;
+    private final ModelMapper modelMapper;
+    private final RestClient.Builder restClientBuilder;
     private final PasswordEncoder passwordEncoder;
     private final ServiceProperties serviceProperties;
 
     @Override
     public RegisterResponse registerUser(RegisterRequest request) {
         //TODO to use model mapper here
-        RegisterUserRequest registerUserRequest = RegisterUserRequest
-                .builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .userRole(UserRole.GUEST)
-                .build();
+//        RegisterUserRequest registerUserRequest = RegisterUserRequest
+//                .builder()
+//                .email(request.getEmail())
+//                .password(passwordEncoder.encode(request.getPassword()))
+//                .firstName(request.getFirstName())
+//                .lastName(request.getLastName())
+//                .userRole(UserRole.GUEST)
+//                .build();
+
+        RegisterUserRequest registerUserRequest = modelMapper.map(request, RegisterUserRequest.class);
+        registerUserRequest.setPassword(passwordEncoder.encode(request.getPassword()));
+        registerUserRequest.setUserRole(UserRole.GUEST);
 
 
-        RegisterResponse registerResponse = restTemplate.postForObject(serviceProperties.getUSER_SERVICE_REGISTER_URL(), registerUserRequest, RegisterResponse.class);
+        RegisterResponse registerUserResponse = restClientBuilder
+                .build()
+                .post()
+                .uri(serviceProperties.getUSER_SERVICE_REGISTER_URL())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(registerUserRequest)
+                .exchange((req, res)->{
+                    RegisterResponse registerResponse = res.bodyTo(RegisterResponse.class);
 
-        return ResponseValidatorUtil
-                .of(registerResponse)
-                .onStatusThrow(HttpStatus.BAD_REQUEST, UserAlreadyRegisteredException::new)
-                .onStatusThrow(HttpStatus.Series.SERVER_ERROR, UserServiceInternalServerError::new)
-                .getOnStatus(HttpStatus.OK)
-                .orElseThrow(UserServiceInternalServerError::new);
+                    if (registerResponse == null) {
+                        throw new UserServiceInternalServerError("NO RESPONSE BODY");
+                    }
+
+                    if(res.getStatusCode().is2xxSuccessful()){
+                        return registerResponse;
+                    }
+
+                    String response = registerResponse.getResponse();
+
+                    if(res.getStatusCode().value() == HttpStatus.BAD_REQUEST.value()){
+                        throw new UserAlreadyRegisteredException(response);
+                    }
+
+                    throw new UserServiceInternalServerError(response);
+                });
+
+        return registerUserResponse;
     }
 
     @Override
     public LoginResponse loginUser(LoginRequest request) {
 
-        //TODO figure out what to do with error when request is returned
-        LoginResponse loginResponse = restTemplate.postForObject(serviceProperties.getUSER_SERVICE_LOGIN_URL(), request, LoginResponse.class);
+        LoginResponse loginUserResponse = restClientBuilder
+                .build()
+                .post()
+                .uri(serviceProperties.getUSER_SERVICE_LOGIN_URL())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .exchange((req, res)->{
+                    LoginResponse loginResponse = res.bodyTo(LoginResponse.class);
 
-        return ResponseValidatorUtil
-                .of(loginResponse)
-                .onStatusThrow(HttpStatus.NOT_FOUND, UserNotFoundException::new)
-                .onStatusThrow(HttpStatus.Series.SERVER_ERROR, UserServiceInternalServerError::new)
-                .getOnStatus(HttpStatus.OK)
-                .orElseThrow(UserServiceInternalServerError::new);
+                    if (loginResponse == null) {
+                        throw new UserServiceInternalServerError("NO RESPONSE BODY");
+                    }
+
+                    if(res.getStatusCode().is2xxSuccessful()){
+                        return loginResponse;
+                    }
+
+                    String response = loginResponse.getResponse();
+
+                    if(res.getStatusCode().value() == HttpStatus.NOT_FOUND.value()){
+                        throw new UserNotFoundException(response);
+                    }
+
+                    throw new UserServiceInternalServerError(response);
+                });
+
+        return loginUserResponse;
     }
 
     @Override
     public void pingUserService() {
-        try {
-            restTemplate.getForObject(serviceProperties.getUSER_SERVICE_HEALTH_CHECK_URL(), String.class);
-            System.out.println("user-service is up and running");
-            System.out.println("CONNECTED TO USER_SERVICES");
+        //If property: user-service.health-check.enabled = true
+        //This check will be performed
 
-        } catch (Exception e) {
-            // If user-service is not available, take appropriate action (e.g., log and prevent auth-service startup)
-            System.err.println("user-service is not available: " + e.getMessage());
-            System.exit(1); // Exit application or throw exception to prevent startup
-        }
+        ResponseEntity<Void> bodilessEntity = restClientBuilder
+                .build()
+                .get()
+                .uri(serviceProperties.getUSER_SERVICE_HEALTH_CHECK_URL())
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, (req, res) -> {
+
+                    String httpStatus = res.getStatusText();
+                    String message = httpStatus + ": Connection to user service failed";
+                    throw new UserServiceConnectionTimeoutException(message);
+                })
+                .toBodilessEntity();
+
+        //TODO maybe stop the server System.exit(1);
     }
 }

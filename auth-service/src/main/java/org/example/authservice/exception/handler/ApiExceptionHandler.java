@@ -3,9 +3,7 @@ package org.example.authservice.exception.handler;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
-import org.example.authservice.exception.exceptions.InvalidLoginCredentialsException;
-import org.example.authservice.exception.exceptions.UserLoginException;
-import org.example.authservice.exception.exceptions.UserRegistrationException;
+import org.example.authservice.exception.exceptions.*;
 import org.example.authservice.exception.helper.ApiException;
 import org.example.authservice.exception.helper.ApiExceptionFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -69,6 +67,30 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleUserLoginException(UserLoginException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(UserAlreadyRegisteredException.class)
+    public ResponseEntity<Object> handleUserAlreadyRegisteredException(UserAlreadyRegisteredException e) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        ApiException apiException = apiExceptionFactory.generateApiException("User already registered", httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(UserServiceInternalServerError.class)
+    public ResponseEntity<Object> handleUserUserServiceInternalServerError(UserServiceInternalServerError e) {
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        ApiException apiException = apiExceptionFactory.generateApiException(e.getMessage(), httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException e) {
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        ApiException apiException = apiExceptionFactory.generateApiException(e.getMessage(), httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);
     }
