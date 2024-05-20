@@ -5,16 +5,12 @@ import lombok.extern.log4j.Log4j2;
 import org.example.authservice.data.Token;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
-import org.example.authservice.data.enums.UserRole;
 import org.example.authservice.dto.login.LoginRequest;
 import org.example.authservice.dto.register.RegisterRequest;
 import org.example.authservice.dto.login.LoginResponse;
 import org.example.authservice.dto.register.RegisterResponse;
-import org.example.authservice.dto.register.RegisterUserRequest;
+import org.example.authservice.exception.exceptions.InvalidJwtTokenException;
 import org.example.authservice.exception.exceptions.InvalidLoginCredentialsException;
-import org.example.authservice.exception.exceptions.UserLoginException;
-import org.example.authservice.exception.exceptions.UserRegistrationException;
-import org.example.authservice.model.UserTokens;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.JwtValidationResponse;
 import org.example.authservice.response.TokenData;
@@ -22,16 +18,12 @@ import org.example.authservice.service.AuthService;
 import org.example.authservice.service.JwtService;
 import org.example.authservice.service.TokenService;
 import org.example.authservice.service.UserService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Map;
 
-import static org.example.authservice.util.AuthenticationResponseUtil.buildAuthResponseError;
 import static org.example.authservice.util.AuthenticationResponseUtil.buildAuthResponseOk;
 
 /**
@@ -82,41 +74,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public JwtValidationResponse validate(String jwtToken) {
 
-        //isExpired throws an error then is expired
-        if(jwtService.isExpired(jwtToken)){
-            return JwtValidationResponse
-                    .builder()
-                    .response("EXPIRED")
-                    .httpStatus(HttpStatus.UNAUTHORIZED)
-                    .build();
-        }
-
+        //notExpired throws an error if expired
+        jwtService.notExpired(jwtToken);
         String subjectEmail = jwtService.extractEmail(jwtToken);
-        UserTokens userTokens = tokenService.getTokens(subjectEmail);
+        Token accessToken = tokenService.findAccessTokenByValueAndEmail(jwtToken, subjectEmail);
 
-        List<Token> accessTokens = userTokens
-                .getAccessTokens();
-
-        if(accessTokens.isEmpty()){
-            return JwtValidationResponse
-                    .builder()
-                    .response("NO ACCESS TOKEN FOUND FOR USER: " + subjectEmail)
-                    .httpStatus(HttpStatus.UNAUTHORIZED)
-                    .build();
-        }
-
-        boolean tokenRevoked = accessTokens
-                .stream()
-                .anyMatch(t -> t
-                        .getValue()
-                        .equals(jwtToken) && t.isRevoked());
-
-        if(tokenRevoked){
-            return JwtValidationResponse
-                    .builder()
-                    .response("REVOKED TOKEN")
-                    .httpStatus(HttpStatus.UNAUTHORIZED)
-                    .build();
+        if (accessToken.isRevoked()) {
+            throw new InvalidJwtTokenException("Token is revoked.");
         }
 
         return JwtValidationResponse

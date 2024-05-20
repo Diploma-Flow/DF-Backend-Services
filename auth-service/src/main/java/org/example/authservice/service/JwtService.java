@@ -18,7 +18,7 @@ public interface JwtService {
 
     <T> T extractClaim(String jsonWebToken, Function<Claims, T> claimsResolver);
 
-    boolean isExpired(String jsonWebToken);
+    boolean notExpired(String jsonWebToken);
 
     String extractEmail(String jsonWebToken);
 }

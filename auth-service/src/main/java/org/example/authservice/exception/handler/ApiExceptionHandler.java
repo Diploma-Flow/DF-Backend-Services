@@ -87,6 +87,22 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiException, httpStatus);
     }
 
+    @ExceptionHandler(UserJwtTokensNotFoundException.class)
+    public ResponseEntity<Object> handleUserJwtTokensNotFoundException(UserJwtTokensNotFoundException e) {
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        ApiException apiException = apiExceptionFactory.generateApiException(e.getMessage(), httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(InvalidJwtTokenException.class)
+    public ResponseEntity<Object> handleInvalidJwtTokenException(InvalidJwtTokenException e) {
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        ApiException apiException = apiExceptionFactory.generateApiException(e.getMessage(), httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException e) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;

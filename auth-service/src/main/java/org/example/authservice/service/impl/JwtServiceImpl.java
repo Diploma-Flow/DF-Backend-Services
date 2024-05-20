@@ -102,7 +102,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean isExpired(String jsonWebToken){
+    public boolean notExpired(String jsonWebToken){
         return extractExpiration(jsonWebToken).before(new Date());
     }
 }

@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.authservice.data.Token;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
+import org.example.authservice.exception.exceptions.InvalidJwtTokenException;
+import org.example.authservice.exception.exceptions.UserJwtTokensNotFoundException;
+import org.example.authservice.exception.exceptions.UserNotFoundException;
 import org.example.authservice.model.UserTokens;
 import org.example.authservice.repository.UserTokensRepository;
 import org.example.authservice.service.TokenService;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -38,7 +42,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void updateTokens(String userEmail, Map<TokenType, String> jwtTokens) {
-        UserTokens userTokens = userTokensRepository.findByOwnerEmail(userEmail).orElseThrow(RuntimeException::new);
+        UserTokens userTokens = userTokensRepository.findByOwnerEmail(userEmail).orElseThrow(UserNotFoundException::new);
 
         Token accessToken = new Token(TokenType.ACCESS, jwtTokens.get(TokenType.ACCESS), false);
         Token refreshToken = new Token(TokenType.REFRESH, jwtTokens.get(TokenType.REFRESH), false);
@@ -59,6 +63,25 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public UserTokens getTokens(String userEmail) {
         Optional<UserTokens> userTokens = userTokensRepository.findByOwnerEmail(userEmail);
-        return userTokens.orElseThrow(RuntimeException::new);
+        return userTokens.orElseThrow(()-> new UserJwtTokensNotFoundException("User tokens not found", userEmail));
+    }
+
+    @Override
+    public Token findAccessTokenByValueAndEmail(String tokenValue, String subjectEmail) {
+        UserTokens userTokens = getTokens(subjectEmail);
+
+        List<Token> accessTokens = Optional.ofNullable(userTokens)
+                .map(UserTokens::getAccessTokens)
+                .orElseThrow(() -> new InvalidJwtTokenException("NO SUCH ACCESS TOKEN FOUND FOR USER: " + subjectEmail));
+
+        Token accessToken = accessTokens
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(token -> token.getValue() != null && token.getValue().equals(tokenValue))
+                .filter(token -> token.getType() != null && token.getType().equals(TokenType.ACCESS))
+                .findFirst()
+                .orElseThrow(() -> new InvalidJwtTokenException("NO SUCH ACCESS TOKEN FOUND FOR USER: " + subjectEmail));
+
+        return accessToken;
     }
 }
