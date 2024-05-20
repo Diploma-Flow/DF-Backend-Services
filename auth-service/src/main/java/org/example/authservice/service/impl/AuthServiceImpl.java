@@ -5,6 +5,8 @@ import lombok.extern.log4j.Log4j2;
 import org.example.authservice.data.Token;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
+import org.example.authservice.data.enums.UserRole;
+import org.example.authservice.dto.RefreshTokenRequest;
 import org.example.authservice.dto.login.LoginRequest;
 import org.example.authservice.dto.register.RegisterRequest;
 import org.example.authservice.dto.login.LoginResponse;
@@ -88,5 +90,35 @@ public class AuthServiceImpl implements AuthService {
                 .response("SUCCESS")
                 .httpStatus(HttpStatus.OK)
                 .build();
+    }
+
+    @Override
+    public AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest) {
+        String jwtToken = refreshTokenRequest.getRefreshToken();
+
+        //validate refresh token
+        jwtService.notExpired(jwtToken);
+        String subjectEmail = jwtService.extractEmail(jwtToken);
+        Token refreshToken = tokenService.findRefreshTokenByValueAndEmail(jwtToken, subjectEmail);
+
+        if (refreshToken.isRevoked()) {
+            throw new InvalidJwtTokenException("Token is revoked.");
+        }
+
+        //Token is valid!
+
+        //generate new tokens
+        User user = User.builder()
+                .role(UserRole.GUEST)
+                .email(subjectEmail)
+                .build();
+
+        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
+
+        //persist new tokens
+        tokenService.updateTokens(subjectEmail, jwtTokens);
+
+        //return new tokens
+        return buildAuthResponseOk(jwtTokens, "Refreshed successful");
     }
 }

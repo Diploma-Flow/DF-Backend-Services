@@ -1,5 +1,6 @@
 package org.example.authservice.service;
 
+import org.example.authservice.dto.RefreshTokenRequest;
 import org.example.authservice.dto.login.LoginRequest;
 import org.example.authservice.dto.register.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
@@ -16,4 +17,6 @@ public interface AuthService {
     AuthenticationResponse<TokenData> login(LoginRequest request);
 
     JwtValidationResponse validate(String jwtToken);
+
+    AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest);
 }

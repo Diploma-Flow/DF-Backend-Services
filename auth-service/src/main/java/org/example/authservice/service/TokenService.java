@@ -16,4 +16,7 @@ public interface TokenService {
     void updateTokens(String userEmail, Map<TokenType, String> jwtTokens);
     UserTokens getTokens(String userEmail);
     Token findAccessTokenByValueAndEmail(String tokenValue, String subjectEmail);
+
+    Token findRefreshTokenByValueAndEmail(String jwtToken, String subjectEmail);
+
 }

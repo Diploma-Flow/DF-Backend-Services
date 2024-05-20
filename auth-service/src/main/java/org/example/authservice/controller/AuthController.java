@@ -2,6 +2,7 @@ package org.example.authservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.example.authservice.dto.RefreshTokenRequest;
 import org.example.authservice.dto.login.LoginRequest;
 import org.example.authservice.dto.register.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
@@ -44,6 +45,16 @@ public class AuthController {
     }
 
     //TODO
+    @PostMapping("/logout")
+    public ResponseEntity<JwtValidationResponse> logout(@RequestBody String jwtToken){
+        //Validate Jwt
+        //Find user
+        //delete all Tokens of that user in Mongo
+        //return success or bad request
+        return null;
+    }
+
+    //TODO
     @PostMapping("/validate")
     public ResponseEntity<JwtValidationResponse> validate(@RequestBody String jwtToken){
         final String methodName = "validate";
@@ -54,14 +65,13 @@ public class AuthController {
     }
 
     //TODO
-    @PostMapping("/logout")
-    public ResponseEntity<JwtValidationResponse> logout(@RequestBody String jwtToken){
-        return null;
-    }
-
-    //TODO
     @PostMapping("/refresh")
-    public ResponseEntity<JwtValidationResponse> refresh(@RequestBody String jwtToken){
-        return null;
+    public ResponseEntity<AuthenticationResponse<TokenData>> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
+        final String methodName = "refresh";
+        log.entering(SOURCE_CLASS, methodName);
+        log.info(refreshTokenRequest.toString());
+
+        AuthenticationResponse<TokenData> authenticationResponse = authService.refresh(refreshTokenRequest);
+        return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
     }
 }

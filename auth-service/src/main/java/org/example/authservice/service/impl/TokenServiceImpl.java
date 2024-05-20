@@ -42,7 +42,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public void updateTokens(String userEmail, Map<TokenType, String> jwtTokens) {
-        UserTokens userTokens = userTokensRepository.findByOwnerEmail(userEmail).orElseThrow(UserNotFoundException::new);
+        UserTokens userTokens = getTokens(userEmail);
 
         Token accessToken = new Token(TokenType.ACCESS, jwtTokens.get(TokenType.ACCESS), false);
         Token refreshToken = new Token(TokenType.REFRESH, jwtTokens.get(TokenType.REFRESH), false);
@@ -83,5 +83,18 @@ public class TokenServiceImpl implements TokenService {
                 .orElseThrow(() -> new InvalidJwtTokenException("NO SUCH ACCESS TOKEN FOUND FOR USER: " + subjectEmail));
 
         return accessToken;
+    }
+
+    @Override
+    public Token findRefreshTokenByValueAndEmail(String jwtToken, String subjectEmail) {
+        UserTokens userTokens = getTokens(subjectEmail);
+
+        Token refreshToken = userTokens.getRefreshToken();
+
+        if (refreshToken == null || refreshToken.getType() != TokenType.REFRESH || !jwtToken.equals(refreshToken.getValue())) {
+            throw new InvalidJwtTokenException("NO SUCH REFRESH TOKEN FOUND FOR USER: " + subjectEmail);
+        }
+
+        return refreshToken;
     }
 }
