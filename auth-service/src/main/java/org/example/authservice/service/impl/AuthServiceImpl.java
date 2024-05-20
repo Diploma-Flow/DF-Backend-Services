@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
             return JwtValidationResponse
                     .builder()
                     .response("EXPIRED")
-                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .httpStatus(HttpStatus.UNAUTHORIZED)
                     .build();
         }
 
@@ -101,7 +101,7 @@ public class AuthServiceImpl implements AuthService {
             return JwtValidationResponse
                     .builder()
                     .response("NO ACCESS TOKEN FOUND FOR USER: " + subjectEmail)
-                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .httpStatus(HttpStatus.UNAUTHORIZED)
                     .build();
         }
 
@@ -115,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
             return JwtValidationResponse
                     .builder()
                     .response("REVOKED TOKEN")
-                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .httpStatus(HttpStatus.UNAUTHORIZED)
                     .build();
         }
 

@@ -24,8 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.function.Predicate;
-
 /**
  * Author: Simeon Popov
  * Date of creation: 3.5.2024 г.
@@ -43,15 +41,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RegisterResponse registerUser(RegisterRequest request) {
-        //TODO to use model mapper here
-//        RegisterUserRequest registerUserRequest = RegisterUserRequest
-//                .builder()
-//                .email(request.getEmail())
-//                .password(passwordEncoder.encode(request.getPassword()))
-//                .firstName(request.getFirstName())
-//                .lastName(request.getLastName())
-//                .userRole(UserRole.GUEST)
-//                .build();
 
         RegisterUserRequest registerUserRequest = modelMapper.map(request, RegisterUserRequest.class);
         registerUserRequest.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -61,7 +50,7 @@ public class UserServiceImpl implements UserService {
         RegisterResponse registerUserResponse = restClientBuilder
                 .build()
                 .post()
-                .uri(serviceProperties.getUSER_SERVICE_REGISTER_URL())
+                .uri(serviceProperties.getUserServiceRegisterUrl())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(registerUserRequest)
                 .exchange((req, res)->{
@@ -93,7 +82,7 @@ public class UserServiceImpl implements UserService {
         LoginResponse loginUserResponse = restClientBuilder
                 .build()
                 .post()
-                .uri(serviceProperties.getUSER_SERVICE_LOGIN_URL())
+                .uri(serviceProperties.getUserServiceLoginUrl())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .exchange((req, res)->{
@@ -127,7 +116,7 @@ public class UserServiceImpl implements UserService {
         ResponseEntity<Void> bodilessEntity = restClientBuilder
                 .build()
                 .get()
-                .uri(serviceProperties.getUSER_SERVICE_HEALTH_CHECK_URL())
+                .uri(serviceProperties.getUserServiceHealthCheckUrl())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
 

@@ -14,14 +14,11 @@ import org.springframework.stereotype.Component;
 public class ServiceProperties {
 
     @Value("${user-service.health-check.url}")
-    private String USER_SERVICE_HEALTH_CHECK_URL;
+    private String userServiceHealthCheckUrl;
 
-    @Value("${user-service.health-check.delay}")
-    private long USER_SERVICE_HEALTH_CHECK_PING_INTERVAL;
+    @Value("${user-service.auth.url.login}")
+    private String userServiceLoginUrl;
 
-    @Value("${user-service.url.login}")
-    private String USER_SERVICE_LOGIN_URL;
-
-    @Value("${user-service.url.register}")
-    private String USER_SERVICE_REGISTER_URL;
+    @Value("${user-service.auth.url.register}")
+    private String userServiceRegisterUrl;
 }

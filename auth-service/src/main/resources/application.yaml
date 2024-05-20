@@ -43,6 +43,7 @@ user-service:
     enabled: false
     url: 'lb://user-service/user/health-check'
     delay: 60000
-  url:
-    login: 'lb://user-service/user/login'
-    register: 'lb://user-service/user/register'
+  auth:
+    url:
+      login: 'lb://user-service/user/login'
+      register: 'lb://user-service/user/register'
