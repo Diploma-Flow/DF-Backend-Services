@@ -1,7 +1,5 @@
 package org.example.authservice.exception.exceptions;
 
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
 
 /**
  * Author: Simeon Popov

@@ -1,6 +1,5 @@
 package org.simo.defaultgateway.service;
 
-import jakarta.ws.rs.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.simo.defaultgateway.exception.exceptions.JwtValidationException;
@@ -17,8 +16,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
-
-import static org.simo.defaultgateway.utils.WebFluxUtils.onError;
 
 
 /**
