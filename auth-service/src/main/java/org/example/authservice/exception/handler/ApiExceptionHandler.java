@@ -77,7 +77,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UserAlreadyRegisteredException.class)
     public ResponseEntity<Object> handleUserAlreadyRegisteredException(UserAlreadyRegisteredException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        ApiException apiException = apiExceptionFactory.generateApiException("User already registered", httpStatus);
+        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);
     }
@@ -85,6 +85,14 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UserServiceInternalServerError.class)
     public ResponseEntity<Object> handleUserUserServiceInternalServerError(UserServiceInternalServerError e) {
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        ApiException apiException = apiExceptionFactory.generateApiException(e.getMessage(), httpStatus);
+
+        return new ResponseEntity<>(apiException, httpStatus);
+    }
+
+    @ExceptionHandler(UserAlreadyLoggedOutException.class)
+    public ResponseEntity<Object> handleUserAlreadyLoggedOutException(UserAlreadyLoggedOutException e) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ApiException apiException = apiExceptionFactory.generateApiException(e.getMessage(), httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);

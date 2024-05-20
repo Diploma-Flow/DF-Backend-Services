@@ -7,6 +7,7 @@ import org.example.authservice.data.Token;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
 import org.example.authservice.data.enums.UserRole;
+import org.example.authservice.request.LogoutRequest;
 import org.example.authservice.request.RefreshTokenRequest;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
@@ -72,6 +73,22 @@ public class AuthServiceImpl implements AuthService {
         tokenService.persist(user, jwtTokens);
 
         return buildAuthResponseOk(jwtTokens, "Login successful");
+    }
+
+    @Override
+    public AuthenticationResponse<Void> logout(LogoutRequest logoutRequest) {
+
+        String jwtAccessToken = logoutRequest.getAccessToken();
+        //Validate Jwt
+        jwtService.notExpired(jwtAccessToken);
+        String subjectEmail = jwtService.extractEmail(jwtAccessToken);
+        tokenService.deleteTokensOf(subjectEmail);
+
+        return AuthenticationResponse.<Void>builder()
+                .httpStatus(HttpStatus.OK)
+                .response("Logout successful")
+                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
+                .build();
     }
 
     //THIS is made to send response and status 200 OK and 401 UNAUTHORIZED every other status will be considered as error

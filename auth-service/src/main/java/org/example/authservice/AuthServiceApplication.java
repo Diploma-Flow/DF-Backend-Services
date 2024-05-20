@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories
 public class AuthServiceApplication {
 
+    //TODO session activity chron job every 30 minutes to delete stale logins
     public static void main(String[] args) {
         SpringApplication.run(AuthServiceApplication.class, args);
     }

@@ -15,4 +15,8 @@ public interface UserTokensRepository extends MongoRepository<UserTokens, String
 
     @Query("{ 'ownerEmail' : ?0 }")
     Optional<UserTokens> findByOwnerEmail(String ownerEmail);
+
+    UserTokens deleteUserTokensByOwnerEmail(String ownerEmail);
+
+    boolean existsByOwnerEmail(String ownerEmail);
 }

@@ -1,5 +1,6 @@
 package org.example.authservice.service;
 
+import org.example.authservice.request.LogoutRequest;
 import org.example.authservice.request.RefreshTokenRequest;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
@@ -19,4 +20,6 @@ public interface AuthService {
     JwtValidationResponse validate(String jwtToken);
 
     AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest);
+
+    AuthenticationResponse<Void> logout(LogoutRequest logoutRequest);
 }

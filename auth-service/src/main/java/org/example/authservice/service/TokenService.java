@@ -19,4 +19,5 @@ public interface TokenService {
 
     Token findRefreshTokenByValueAndEmail(String jwtToken, String subjectEmail);
 
+    void deleteTokensOf(String subjectEmail);
 }

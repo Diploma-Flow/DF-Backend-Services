@@ -2,6 +2,7 @@ package org.example.authservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.example.authservice.request.LogoutRequest;
 import org.example.authservice.request.RefreshTokenRequest;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
@@ -46,12 +47,12 @@ public class AuthController {
 
     //TODO
     @PostMapping("/logout")
-    public ResponseEntity<JwtValidationResponse> logout(@RequestBody String jwtToken){
-        //Validate Jwt
-        //Find user
-        //delete all Tokens of that user in Mongo
-        //return success or bad request
-        return null;
+    public ResponseEntity<AuthenticationResponse<Void>> logout(@RequestBody LogoutRequest logoutRequest){
+        final String methodName = "logout";
+        log.entering(SOURCE_CLASS, methodName);
+
+        AuthenticationResponse<Void> authenticationResponse = authService.logout(logoutRequest);
+        return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
     }
 
     //TODO

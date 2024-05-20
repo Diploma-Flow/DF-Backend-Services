@@ -5,11 +5,14 @@ import org.example.authservice.data.Token;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
 import org.example.authservice.exception.exceptions.InvalidJwtTokenException;
+import org.example.authservice.exception.exceptions.UserAlreadyLoggedOutException;
 import org.example.authservice.exception.exceptions.UserJwtTokensNotFoundException;
 import org.example.authservice.exception.exceptions.UserNotFoundException;
 import org.example.authservice.model.UserTokens;
 import org.example.authservice.repository.UserTokensRepository;
 import org.example.authservice.service.TokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +28,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
+    private static final Logger log = LoggerFactory.getLogger(TokenServiceImpl.class);
     private final UserTokensRepository userTokensRepository;
 
     @Override
@@ -96,5 +100,15 @@ public class TokenServiceImpl implements TokenService {
         }
 
         return refreshToken;
+    }
+
+    @Override
+    public void deleteTokensOf(String subjectEmail) {
+        if (!userTokensRepository.existsByOwnerEmail(subjectEmail)) {
+            throw new UserAlreadyLoggedOutException("User already logged out");
+        }
+
+        userTokensRepository.deleteUserTokensByOwnerEmail(subjectEmail);
+        log.info("Logged out user tokens for {}", subjectEmail);
     }
 }

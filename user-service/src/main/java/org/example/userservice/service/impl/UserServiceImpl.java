@@ -18,7 +18,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.print.attribute.standard.Destination;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Author: Simeon Popov
@@ -35,7 +39,7 @@ public class UserServiceImpl implements UserService {
     public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
         UserDetails userDetails = modelMapper.map(registerUserRequest, UserDetails.class);
 
-        String generatedUsername = generateUsername(registerUserRequest.getFirstName(), registerUserRequest.getLastName());
+        String generatedUsername = generateUniqueUsername(registerUserRequest.getFirstName(), registerUserRequest.getLastName());
 
         UserAccount userAccount = UserAccount.builder()
                 .email(registerUserRequest.getEmail().toLowerCase())
@@ -70,7 +74,28 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    private static String generateUsername(String firstName, String lastName) {
+    public String generateUniqueUsername(String firstName, String lastName) {
+        String baseUsername = generateBaseUsername(firstName, lastName);
+        List<UserAccount> userAccountsWithSimilarUsername = userAccountRepository.findUserAccountsByUsernameStartingWith(baseUsername);
+        if (userAccountsWithSimilarUsername.isEmpty()) {
+            return baseUsername;
+        }
+        int maxSuffix = userAccountsWithSimilarUsername.stream()
+                .map(user -> user.getUsername().replace(baseUsername, ""))
+                .filter(suffix -> !suffix.isEmpty())
+                .mapToInt(suffix -> {
+                    try {
+                        return Integer.parseInt(suffix);
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                })
+                .max()
+                .orElse(0);
+        return baseUsername + (maxSuffix + 1);
+    }
+
+    private String generateBaseUsername(String firstName, String lastName) {
         // Concatenate the first and last names
         String combinedName = (firstName + lastName).toLowerCase();
         StringBuilder username = new StringBuilder("@");
