@@ -1,17 +1,16 @@
-package org.example.authservice.service.impl;
+package org.example.authservice.client;
 
 import lombok.RequiredArgsConstructor;
 import org.example.authservice.data.enums.UserRole;
-import org.example.authservice.dto.login.LoginRequest;
-import org.example.authservice.dto.login.LoginResponse;
-import org.example.authservice.dto.register.RegisterRequest;
-import org.example.authservice.dto.register.RegisterResponse;
-import org.example.authservice.dto.register.RegisterUserRequest;
+import org.example.authservice.request.LoginRequest;
+import org.example.authservice.response.LoginResponse;
+import org.example.authservice.request.RegisterRequest;
+import org.example.authservice.client.response.UserRegistrationResponse;
+import org.example.authservice.client.request.UserRegistrationRequest;
 import org.example.authservice.exception.exceptions.UserAlreadyRegisteredException;
 import org.example.authservice.exception.exceptions.UserNotFoundException;
 import org.example.authservice.exception.exceptions.UserServiceConnectionTimeoutException;
 import org.example.authservice.exception.exceptions.UserServiceInternalServerError;
-import org.example.authservice.service.UserService;
 import org.example.authservice.util.ServiceProperties;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -31,40 +30,39 @@ import org.springframework.web.client.RestClient;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceClient {
 
-    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(UserServiceClient.class);
     private final ModelMapper modelMapper;
     private final RestClient.Builder restClientBuilder;
     private final PasswordEncoder passwordEncoder;
     private final ServiceProperties serviceProperties;
 
-    @Override
-    public RegisterResponse registerUser(RegisterRequest request) {
+    public UserRegistrationResponse registerUser(RegisterRequest request) {
 
-        RegisterUserRequest registerUserRequest = modelMapper.map(request, RegisterUserRequest.class);
-        registerUserRequest.setPassword(passwordEncoder.encode(request.getPassword()));
-        registerUserRequest.setUserRole(UserRole.GUEST);
+        UserRegistrationRequest userRegistrationRequest = modelMapper.map(request, UserRegistrationRequest.class);
+        userRegistrationRequest.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRegistrationRequest.setUserRole(UserRole.GUEST);
 
 
-        RegisterResponse registerUserResponse = restClientBuilder
+        UserRegistrationResponse registerUserResponse = restClientBuilder
                 .build()
                 .post()
                 .uri(serviceProperties.getUserServiceRegisterUrl())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(registerUserRequest)
+                .body(userRegistrationRequest)
                 .exchange((req, res)->{
-                    RegisterResponse registerResponse = res.bodyTo(RegisterResponse.class);
+                    UserRegistrationResponse userRegistrationResponse = res.bodyTo(UserRegistrationResponse.class);
 
-                    if (registerResponse == null) {
+                    if (userRegistrationResponse == null) {
                         throw new UserServiceInternalServerError("NO RESPONSE BODY");
                     }
 
                     if(res.getStatusCode().is2xxSuccessful()){
-                        return registerResponse;
+                        return userRegistrationResponse;
                     }
 
-                    String response = registerResponse.getResponse();
+                    String response = userRegistrationResponse.getResponse();
 
                     if(res.getStatusCode().value() == HttpStatus.BAD_REQUEST.value()){
                         throw new UserAlreadyRegisteredException(response);
@@ -76,7 +74,6 @@ public class UserServiceImpl implements UserService {
         return registerUserResponse;
     }
 
-    @Override
     public LoginResponse loginUser(LoginRequest request) {
 
         LoginResponse loginUserResponse = restClientBuilder
@@ -108,7 +105,6 @@ public class UserServiceImpl implements UserService {
         return loginUserResponse;
     }
 
-    @Override
     public void pingUserService() {
         //If property: user-service.health-check.enabled = true
         //This check will be performed

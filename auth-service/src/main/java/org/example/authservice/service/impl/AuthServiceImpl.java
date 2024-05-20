@@ -2,15 +2,16 @@ package org.example.authservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.example.authservice.client.UserServiceClient;
 import org.example.authservice.data.Token;
 import org.example.authservice.data.TokenType;
 import org.example.authservice.data.entity.User;
 import org.example.authservice.data.enums.UserRole;
-import org.example.authservice.dto.RefreshTokenRequest;
-import org.example.authservice.dto.login.LoginRequest;
-import org.example.authservice.dto.register.RegisterRequest;
-import org.example.authservice.dto.login.LoginResponse;
-import org.example.authservice.dto.register.RegisterResponse;
+import org.example.authservice.request.RefreshTokenRequest;
+import org.example.authservice.request.LoginRequest;
+import org.example.authservice.request.RegisterRequest;
+import org.example.authservice.response.LoginResponse;
+import org.example.authservice.client.response.UserRegistrationResponse;
 import org.example.authservice.exception.exceptions.InvalidJwtTokenException;
 import org.example.authservice.exception.exceptions.InvalidLoginCredentialsException;
 import org.example.authservice.response.AuthenticationResponse;
@@ -19,11 +20,12 @@ import org.example.authservice.response.TokenData;
 import org.example.authservice.service.AuthService;
 import org.example.authservice.service.JwtService;
 import org.example.authservice.service.TokenService;
-import org.example.authservice.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import static org.example.authservice.util.AuthenticationResponseUtil.buildAuthResponseOk;
@@ -40,24 +42,25 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtService jwtService;
     private final TokenService tokenService;
-    private final UserService userService;
+    private final UserServiceClient userServiceClient;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public AuthenticationResponse<TokenData> register(RegisterRequest request) {
+    public AuthenticationResponse<Void> register(RegisterRequest request) {
         log.info("Sending register request to user-service");
-        RegisterResponse userRegisterResponse = userService.registerUser(request);
-        User user = userRegisterResponse.getUser();
-        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
-        tokenService.persist(user, jwtTokens);
+        UserRegistrationResponse userRegistrationResponse = userServiceClient.registerUser(request);
 
-        return buildAuthResponseOk(jwtTokens, "Registration successful");
+        return AuthenticationResponse.<Void>builder()
+                .httpStatus(userRegistrationResponse.getHttpStatus())
+                .response(userRegistrationResponse.getResponse())
+                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
+                .build();
     }
 
     @Override
     public AuthenticationResponse<TokenData> login(LoginRequest request) {
         log.info("Sending login request to user-service");
-        LoginResponse userLoginResponse = userService.loginUser(request);
+        LoginResponse userLoginResponse = userServiceClient.loginUser(request);
         User user = userLoginResponse.getUser();
 
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -66,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Generate JWT tokens for the retrieved user
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
-        tokenService.updateTokens(user.getEmail(), jwtTokens);
+        tokenService.persist(user, jwtTokens);
 
         return buildAuthResponseOk(jwtTokens, "Login successful");
     }

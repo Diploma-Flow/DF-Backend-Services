@@ -23,16 +23,6 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ApiExceptionHandler {
 
-//    private final ApiExceptionFactory apiExceptionFactory;
-//
-//    @ExceptionHandler(RuntimeException.class)
-//    public ResponseEntity<Object> handleUserNotRegisteredException(RuntimeException e) {
-//        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-//        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
-//
-//        return new ResponseEntity<>(apiException, httpStatus);
-//    }
-
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<RegisterUserResponse> handleConstraintViolationException(ConstraintViolationException ex) {
         List<ConstraintViolationDetail> violationDetails = ex.getConstraintViolations()

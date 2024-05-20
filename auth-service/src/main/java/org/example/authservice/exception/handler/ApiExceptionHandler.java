@@ -3,6 +3,7 @@ package org.example.authservice.exception.handler;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.example.authservice.exception.exceptions.*;
 import org.example.authservice.exception.helper.ApiException;
 import org.example.authservice.exception.helper.ApiExceptionFactory;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * Date of creation: 23.1.2024 г.
  */
 
+@Log4j2
 @RequiredArgsConstructor
 @ControllerAdvice
 public class ApiExceptionHandler {
@@ -26,7 +28,8 @@ public class ApiExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+        log.warn(e.getMessage());
+        ApiException apiException = apiExceptionFactory.generateApiException("User already logged in", httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);
     }

@@ -13,6 +13,7 @@ import org.example.userservice.repository.UserAccountRepository;
 import org.example.userservice.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -34,21 +35,22 @@ public class UserServiceImpl implements UserService {
     public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
         UserDetails userDetails = modelMapper.map(registerUserRequest, UserDetails.class);
 
+        String generatedUsername = generateUsername(registerUserRequest.getFirstName(), registerUserRequest.getLastName());
+
         UserAccount userAccount = UserAccount.builder()
                 .email(registerUserRequest.getEmail().toLowerCase())
                 .password(registerUserRequest.getPassword())
                 .role(registerUserRequest.getUserRole())
-                .username(generateUsername(registerUserRequest.getFirstName(), registerUserRequest.getLastName()))
+                .username(generatedUsername)
                 .userDetails(userDetails)
                 .build();
 
-        UserAccount savedUserAccount = userAccountRepository.save(userAccount);
+        userAccountRepository.save(userAccount);
 
         return RegisterUserResponse
                 .builder()
                 .httpStatus(HttpStatus.OK)
-                .response("Saved successfully")
-                .user(new User(savedUserAccount.getEmail(), savedUserAccount.getRole(), ""))
+                .response("Registered successfully with username: " + generatedUsername)
                 .build();
     }
 
@@ -57,14 +59,6 @@ public class UserServiceImpl implements UserService {
         Optional<UserAccount> optionalUserAccount = userAccountRepository.findByEmail(request
                 .getEmail()
                 .toLowerCase());
-
-//        if(optionalUserAccount.isEmpty()){
-//            return  LoginResponse
-//                    .builder()
-//                    .httpStatus(HttpStatus.NOT_FOUND)
-//                    .response("User with such email not found")
-//                    .build();
-//        }
 
         UserAccount user = optionalUserAccount.orElseThrow(UserNotFoundException::new);
 

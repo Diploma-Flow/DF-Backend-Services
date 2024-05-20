@@ -23,5 +23,4 @@ public class RegisterUserResponse {
     private List<ConstraintViolationDetail> constraintViolations;
     private String response;
     private HttpStatus httpStatus;
-    private User user;
 }

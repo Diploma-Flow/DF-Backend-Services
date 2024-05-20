@@ -1,4 +1,4 @@
-package org.example.authservice.dto.register;
+package org.example.authservice.client.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ import org.example.authservice.data.enums.UserRole;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegisterUserRequest {
+public class UserRegistrationRequest {
     private String email;
     private String password;
     private String firstName;

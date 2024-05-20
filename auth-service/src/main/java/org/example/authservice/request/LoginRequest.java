@@ -1,4 +1,4 @@
-package org.example.authservice.dto.register;
+package org.example.authservice.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,11 +10,9 @@ import lombok.Data;
  */
 
 @Data
-@AllArgsConstructor
 @Builder
-public class RegisterRequest {
+@AllArgsConstructor
+public class LoginRequest {
     private final String email;
     private final String password;
-    private final String firstName;
-    private final String lastName;
 }
