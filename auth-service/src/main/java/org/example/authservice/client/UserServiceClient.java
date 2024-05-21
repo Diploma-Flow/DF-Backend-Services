@@ -1,9 +1,9 @@
 package org.example.authservice.client;
 
 import lombok.RequiredArgsConstructor;
-import org.example.authservice.data.enums.UserRole;
+import org.example.authservice.enums.UserRole;
 import org.example.authservice.request.LoginRequest;
-import org.example.authservice.response.LoginResponse;
+import org.example.authservice.client.response.UserLoginResponse;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.client.response.UserRegistrationResponse;
 import org.example.authservice.client.request.UserRegistrationRequest;
@@ -74,26 +74,26 @@ public class UserServiceClient {
         return registerUserResponse;
     }
 
-    public LoginResponse loginUser(LoginRequest request) {
+    public UserLoginResponse loginUser(LoginRequest request) {
 
-        LoginResponse loginUserResponse = restClientBuilder
+        UserLoginResponse loginUserResponse = restClientBuilder
                 .build()
                 .post()
                 .uri(serviceProperties.getUserServiceLoginUrl())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .exchange((req, res)->{
-                    LoginResponse loginResponse = res.bodyTo(LoginResponse.class);
+                    UserLoginResponse userLoginResponse = res.bodyTo(UserLoginResponse.class);
 
-                    if (loginResponse == null) {
+                    if (userLoginResponse == null) {
                         throw new UserServiceInternalServerError("NO RESPONSE BODY");
                     }
 
                     if(res.getStatusCode().is2xxSuccessful()){
-                        return loginResponse;
+                        return userLoginResponse;
                     }
 
-                    String response = loginResponse.getResponse();
+                    String response = userLoginResponse.getResponse();
 
                     if(res.getStatusCode().value() == HttpStatus.NOT_FOUND.value()){
                         throw new UserNotFoundException(response);
@@ -118,6 +118,7 @@ public class UserServiceClient {
 
                     String httpStatus = res.getStatusText();
                     String message = httpStatus + ": Connection to user service failed";
+                    log.error(message);
                     throw new UserServiceConnectionTimeoutException(message);
                 })
                 .toBodilessEntity();

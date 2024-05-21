@@ -1,4 +1,4 @@
-package org.example.authservice.data;
+package org.example.authservice.enums;
 
 /**
  * Author: Simeon Popov

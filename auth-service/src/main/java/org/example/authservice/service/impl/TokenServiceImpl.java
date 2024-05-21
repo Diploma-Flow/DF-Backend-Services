@@ -1,13 +1,12 @@
 package org.example.authservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.authservice.data.Token;
-import org.example.authservice.data.TokenType;
-import org.example.authservice.data.entity.User;
+import org.example.authservice.dto.Token;
+import org.example.authservice.enums.TokenType;
+import org.example.authservice.dto.User;
 import org.example.authservice.exception.exceptions.InvalidJwtTokenException;
 import org.example.authservice.exception.exceptions.UserAlreadyLoggedOutException;
 import org.example.authservice.exception.exceptions.UserJwtTokensNotFoundException;
-import org.example.authservice.exception.exceptions.UserNotFoundException;
 import org.example.authservice.model.UserTokens;
 import org.example.authservice.repository.UserTokensRepository;
 import org.example.authservice.service.TokenService;

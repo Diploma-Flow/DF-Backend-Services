@@ -1,8 +1,8 @@
 package org.example.authservice.service;
 
 import io.jsonwebtoken.Claims;
-import org.example.authservice.data.TokenType;
-import org.example.authservice.data.entity.User;
+import org.example.authservice.enums.TokenType;
+import org.example.authservice.dto.User;
 
 import java.util.Map;
 import java.util.function.Function;

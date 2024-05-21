@@ -1,7 +1,8 @@
-package org.example.authservice.data;
+package org.example.authservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.example.authservice.enums.TokenType;
 
 /**
  * Author: Simeon Popov

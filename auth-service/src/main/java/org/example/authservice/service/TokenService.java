@@ -1,8 +1,8 @@
 package org.example.authservice.service;
 
-import org.example.authservice.data.Token;
-import org.example.authservice.data.TokenType;
-import org.example.authservice.data.entity.User;
+import org.example.authservice.dto.Token;
+import org.example.authservice.enums.TokenType;
+import org.example.authservice.dto.User;
 import org.example.authservice.model.UserTokens;
 
 import java.util.Map;

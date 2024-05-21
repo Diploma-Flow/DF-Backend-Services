@@ -1,6 +1,5 @@
 package org.example.authservice.repository;
 
-import org.example.authservice.data.Token;
 import org.example.authservice.model.UserTokens;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

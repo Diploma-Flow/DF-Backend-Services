@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.authservice.data.enums.UserRole;
+import org.example.authservice.enums.UserRole;
 
 /**
  * Author: Simeon Popov

@@ -1,7 +1,7 @@
-package org.example.authservice.response;
+package org.example.authservice.client.response;
 
 import lombok.*;
-import org.example.authservice.data.entity.User;
+import org.example.authservice.dto.User;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 
 @Data
 @AllArgsConstructor
-public class LoginResponse {
+public class UserLoginResponse {
     private final String response;
     private final HttpStatus httpStatus;
     private final User user;

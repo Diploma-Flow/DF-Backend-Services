@@ -1,9 +1,9 @@
-package org.example.authservice.data.entity;
+package org.example.authservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.example.authservice.data.enums.UserRole;
+import org.example.authservice.enums.UserRole;
 
 /**
  * Author: Simeon Popov

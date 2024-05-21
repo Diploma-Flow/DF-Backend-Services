@@ -1,6 +1,6 @@
 package org.example.authservice.util;
 
-import org.example.authservice.data.TokenType;
+import org.example.authservice.enums.TokenType;
 import org.example.authservice.response.AuthenticationResponse;
 import org.example.authservice.response.TokenData;
 import org.springframework.http.HttpStatus;

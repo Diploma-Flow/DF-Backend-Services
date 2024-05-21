@@ -32,8 +32,8 @@ public class AuthController {
         final String methodName = "register";
         log.entering(SOURCE_CLASS, methodName);
 
-        AuthenticationResponse<Void> authenticationResponse = authService.register(request);
-        return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
+        AuthenticationResponse<Void> authServiceResponse = authService.register(request);
+        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
     @PostMapping("/login")
@@ -41,8 +41,8 @@ public class AuthController {
         final String methodName = "login";
         log.entering(SOURCE_CLASS, methodName);
 
-        AuthenticationResponse<TokenData> authenticationResponse = authService.login(request);
-        return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
+        AuthenticationResponse<TokenData> authServiceResponse = authService.login(request);
+        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
     //TODO
@@ -51,18 +51,18 @@ public class AuthController {
         final String methodName = "logout";
         log.entering(SOURCE_CLASS, methodName);
 
-        AuthenticationResponse<Void> authenticationResponse = authService.logout(logoutRequest);
-        return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
+        AuthenticationResponse<Void> authServiceResponse = authService.logout(logoutRequest);
+        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
     //TODO
     @PostMapping("/validate")
-    public ResponseEntity<JwtValidationResponse> validate(@RequestBody String jwtToken){
+    public ResponseEntity<AuthenticationResponse<Void>> validate(@RequestBody String jwtToken){
         final String methodName = "validate";
         log.entering(SOURCE_CLASS, methodName);
 
-        JwtValidationResponse jwtValidationResponse = authService.validate(jwtToken);
-        return ResponseEntity.status(jwtValidationResponse.getHttpStatus()).body(jwtValidationResponse);
+        AuthenticationResponse<Void> authServiceResponse = authService.validate(jwtToken);
+        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
     //TODO
@@ -72,7 +72,7 @@ public class AuthController {
         log.entering(SOURCE_CLASS, methodName);
         log.info(refreshTokenRequest.toString());
 
-        AuthenticationResponse<TokenData> authenticationResponse = authService.refresh(refreshTokenRequest);
-        return ResponseEntity.status(authenticationResponse.getHttpStatus()).body(authenticationResponse);
+        AuthenticationResponse<TokenData> authServiceResponse = authService.refresh(refreshTokenRequest);
+        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 }

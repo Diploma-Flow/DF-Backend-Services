@@ -17,7 +17,7 @@ public interface AuthService {
 
     AuthenticationResponse<TokenData> login(LoginRequest request);
 
-    JwtValidationResponse validate(String jwtToken);
+    AuthenticationResponse<Void> validate(String jwtToken);
 
     AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest);
 
