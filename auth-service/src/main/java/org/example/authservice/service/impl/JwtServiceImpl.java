@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.Data;
 import org.example.authservice.enums.TokenType;
 import org.example.authservice.dto.User;
+import org.example.authservice.enums.UserRole;
 import org.example.authservice.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -104,5 +105,11 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public boolean notExpired(String jsonWebToken){
         return extractExpiration(jsonWebToken).before(new Date());
+    }
+
+    @Override
+    public UserRole extractUserRole(String jsonWebToken) {
+        String role = extractClaim(jsonWebToken, claims -> claims.get("role", String.class));
+        return UserRole.valueOf(role.toUpperCase());
     }
 }

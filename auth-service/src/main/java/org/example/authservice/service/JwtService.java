@@ -3,6 +3,7 @@ package org.example.authservice.service;
 import io.jsonwebtoken.Claims;
 import org.example.authservice.enums.TokenType;
 import org.example.authservice.dto.User;
+import org.example.authservice.enums.UserRole;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -21,4 +22,6 @@ public interface JwtService {
     boolean notExpired(String jsonWebToken);
 
     String extractEmail(String jsonWebToken);
+
+    UserRole extractUserRole(String jsonWebToken);
 }

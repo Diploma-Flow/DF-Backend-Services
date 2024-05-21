@@ -1,5 +1,6 @@
 package org.example.authservice.service.impl;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.example.authservice.client.UserServiceClient;
@@ -118,6 +119,7 @@ public class AuthServiceImpl implements AuthService {
         String jwtToken = refreshTokenRequest.getRefreshToken();
         jwtService.notExpired(jwtToken);
         String subjectEmail = jwtService.extractEmail(jwtToken);
+        UserRole userRole = jwtService.extractUserRole(jwtToken);
         Token refreshToken = tokenService.findRefreshTokenByValueAndEmail(jwtToken, subjectEmail);
 
         if (refreshToken.isRevoked()) {
@@ -125,7 +127,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = User.builder()
-                .role(UserRole.GUEST)
+                .role(userRole)
                 .email(subjectEmail)
                 .build();
 
