@@ -12,6 +12,7 @@
         <module name="default-gateway" />
         <module name="message-service" />
         <module name="eureka-server" />
+        <module name="auth-service-v2" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -21,6 +22,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="auth-service" options="-parameters" />
+      <module name="auth-service-v2" options="-parameters" />
       <module name="default-gateway" options="-parameters" />
       <module name="demo" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
