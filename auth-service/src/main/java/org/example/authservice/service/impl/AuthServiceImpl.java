@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.example.authservice.client.UserServiceClient;
+import org.example.authservice.client.request.UserRegistrationRequest;
 import org.example.authservice.dto.Token;
 import org.example.authservice.enums.TokenType;
 import org.example.authservice.dto.User;
@@ -21,10 +22,13 @@ import org.example.authservice.response.TokenData;
 import org.example.authservice.service.AuthService;
 import org.example.authservice.service.JwtService;
 import org.example.authservice.service.TokenService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Type;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -45,18 +49,23 @@ public class AuthServiceImpl implements AuthService {
     private final TokenService tokenService;
     private final UserServiceClient userServiceClient;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Override
     public AuthenticationResponse<Void> register(RegisterRequest request) {
         log.info("Sending register request to user-service");
 
-        UserRegistrationResponse userRegistrationResponse = userServiceClient.registerUser(request);
+        UserRegistrationRequest userRegistrationRequest = modelMapper.map(request, UserRegistrationRequest.class);
+        userRegistrationRequest.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRegistrationRequest.setUserRole(UserRole.GUEST);
 
-        return AuthenticationResponse.<Void>builder()
-                .httpStatus(userRegistrationResponse.getHttpStatus())
-                .response(userRegistrationResponse.getResponse())
-                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
-                .build();
+        UserRegistrationResponse userRegistrationResponse = userServiceClient.registerUser(userRegistrationRequest);
+
+        Type authenticationResponseType = new TypeToken<AuthenticationResponse<Void>>() {}.getType();
+        AuthenticationResponse<Void> authenticationResponse = modelMapper.map(userRegistrationResponse, authenticationResponseType);
+        authenticationResponse.setTimestamp(ZonedDateTime.now(ZoneId.of("Z")));
+
+        return authenticationResponse;
     }
 
     @Override

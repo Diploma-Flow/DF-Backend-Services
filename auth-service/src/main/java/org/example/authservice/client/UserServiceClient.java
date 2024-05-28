@@ -38,12 +38,7 @@ public class UserServiceClient {
     private final PasswordEncoder passwordEncoder;
     private final ServiceProperties serviceProperties;
 
-    public UserRegistrationResponse registerUser(RegisterRequest request) {
-
-        UserRegistrationRequest userRegistrationRequest = modelMapper.map(request, UserRegistrationRequest.class);
-        userRegistrationRequest.setPassword(passwordEncoder.encode(request.getPassword()));
-        userRegistrationRequest.setUserRole(UserRole.GUEST);
-
+    public UserRegistrationResponse registerUser(UserRegistrationRequest userRegistrationRequest) {
 
         UserRegistrationResponse registerUserResponse = restClientBuilder
                 .build()
@@ -115,7 +110,6 @@ public class UserServiceClient {
                 .uri(serviceProperties.getUserServiceHealthCheckUrl())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
-
                     String httpStatus = res.getStatusText();
                     String message = httpStatus + ": Connection to user service failed";
                     log.error(message);
