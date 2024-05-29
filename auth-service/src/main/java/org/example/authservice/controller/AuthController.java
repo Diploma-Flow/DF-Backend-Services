@@ -55,15 +55,15 @@ public class AuthController {
 //        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
 //    }
 //
-//    //TODO
-//    @PostMapping("/validate")
-//    public ResponseEntity<AuthenticationResponse<Void>> validate(@RequestBody String jwtToken){
-//        final String methodName = "validate";
-//        log.entering(SOURCE_CLASS, methodName);
-//
-//        AuthenticationResponse<Void> authServiceResponse = authService.validate(jwtToken);
-//        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
-//    }
+    //TODO
+    @PostMapping("/validate")
+    public ResponseEntity<AuthenticationResponse<Void>> validate(@RequestBody String jwtToken){
+        final String methodName = "validate";
+        log.entering(SOURCE_CLASS, methodName);
+
+        AuthenticationResponse<Void> authServiceResponse = authService.validate(jwtToken);
+        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
+    }
 //
 //    //TODO
 //    @PostMapping("/refresh")

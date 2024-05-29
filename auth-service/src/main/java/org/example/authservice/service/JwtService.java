@@ -19,9 +19,16 @@ public interface JwtService {
 
     <T> T extractClaim(String jsonWebToken, Function<Claims, T> claimsResolver);
 
-    boolean notExpired(String jsonWebToken);
+    boolean checkNotExpired(String jsonWebToken);
 
     String extractEmail(String jsonWebToken);
 
+    TokenType extractTokenType(String jsonWebToken);
+
+    boolean isTokenType(String jsonWebToken, TokenType tokenType);
+
     UserRole extractUserRole(String jsonWebToken);
+
+    void verifyAccessTokenType(String jwtToken);
+    void verifyRefreshTokenType(String jwtToken);
 }

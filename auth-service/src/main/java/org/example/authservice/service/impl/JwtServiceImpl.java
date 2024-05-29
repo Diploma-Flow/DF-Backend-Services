@@ -9,6 +9,7 @@ import lombok.Data;
 import org.example.authservice.enums.TokenType;
 import org.example.authservice.dto.User;
 import org.example.authservice.enums.UserRole;
+import org.example.authservice.exception.exceptions.InvalidJwtTokenException;
 import org.example.authservice.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,9 @@ public class JwtServiceImpl implements JwtService {
         Date issuedAt = new Date(System.currentTimeMillis());
         Date expiredAt = new Date(System.currentTimeMillis() + expiration);
 
-        Map<String, Object> extraClaims = Map.of("role", user.getRole());
+        Map<String, Object> extraClaims = Map.of(
+                "role", user.getRole(),
+                "type", tokenType.name());
 
         return Jwts
                 .builder()
@@ -84,6 +87,18 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
+    public TokenType extractTokenType(String jsonWebToken) {
+        String tokenType = extractClaim(jsonWebToken, claims -> claims.get("type", String.class));
+        return TokenType.valueOf(tokenType.toUpperCase());
+    }
+
+    @Override
+    public boolean isTokenType(String jsonWebToken, TokenType tokenType) {
+        TokenType extractTokenType = extractTokenType(jsonWebToken);
+        return extractTokenType.equals(tokenType);
+    }
+
+    @Override
     public <T> T extractClaim(String jsonWebToken, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(jsonWebToken);
         return claimsResolver.apply(claims);
@@ -103,7 +118,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean notExpired(String jsonWebToken){
+    public boolean checkNotExpired(String jsonWebToken){
         return extractExpiration(jsonWebToken).before(new Date());
     }
 
@@ -111,5 +126,21 @@ public class JwtServiceImpl implements JwtService {
     public UserRole extractUserRole(String jsonWebToken) {
         String role = extractClaim(jsonWebToken, claims -> claims.get("role", String.class));
         return UserRole.valueOf(role.toUpperCase());
+    }
+
+    @Override
+    public void verifyAccessTokenType(String jwtToken) {
+        boolean isAccessToken = isTokenType(jwtToken, TokenType.ACCESS);
+        if (!isAccessToken) {
+            throw new InvalidJwtTokenException("Wrong token provided");
+        }
+    }
+
+    @Override
+    public void verifyRefreshTokenType(String jwtToken) {
+        boolean isRefreshToken = isTokenType(jwtToken, TokenType.REFRESH);
+        if (!isRefreshToken) {
+            throw new InvalidJwtTokenException("Wrong token provided");
+        }
     }
 }
