@@ -10,6 +10,7 @@ import org.example.authservice.dto.User;
 import org.example.authservice.enums.UserRole;
 import org.example.authservice.model.UserToken;
 import org.example.authservice.request.LoginRequest;
+import org.example.authservice.request.RefreshTokenRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.client.response.UserLoginResponse;
 import org.example.authservice.client.response.UserRegistrationResponse;
@@ -131,31 +132,47 @@ public class AuthServiceImpl implements AuthService {
 //                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
 //                .build();
 //    }
-//
-//
-//    //TODO refresh
-//    @Override
-//    public AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest) {
-//        log.info("Refreshing jwt tokens");
-//
-//        String jwtToken = refreshTokenRequest.getRefreshToken();
-//        jwtService.notExpired(jwtToken);
-//        String subjectEmail = jwtService.extractEmail(jwtToken);
-//        UserRole userRole = jwtService.extractUserRole(jwtToken);
-//        Token refreshToken = tokenService.findRefreshTokenByValueAndEmail(jwtToken, subjectEmail);
-//
-//        if (refreshToken.isRevoked()) {
-//            throw new InvalidJwtTokenException("Token is revoked.");
-//        }
-//
-//        User user = User.builder()
-//                .role(userRole)
-//                .email(subjectEmail)
-//                .build();
-//
-//        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
-//        tokenService.updateTokens(subjectEmail, jwtTokens);
-//
-//        return buildAuthResponseOk(jwtTokens, "Refreshed successful");
-//    }
+
+    //TODO refresh
+    @Override
+    public AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest) {
+        log.info("Refreshing jwt tokens");
+
+        String providedRefreshToken = refreshTokenRequest.getRefreshToken();
+
+        jwtService.checkNotExpired(providedRefreshToken);
+        jwtService.verifyRefreshTokenType(providedRefreshToken);
+
+        // throws exception if no token found but must change the exception
+        UserToken persistedUserToken = tokenService.getTokenByValue(providedRefreshToken);
+        tokenService.verifyNotRevoked(persistedUserToken);
+
+        String subjectEmail = jwtService.extractEmail(providedRefreshToken);
+        UserRole userRole = jwtService.extractUserRole(providedRefreshToken);
+
+        User user = User.builder()
+                .role(userRole)
+                .email(subjectEmail)
+                .build();
+
+        //TODO not sure if a new refresh is needed or just to let it expire and then new authentication
+        // 3. Generating access/refresh tokens
+        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
+
+        // 4. Creating persistedUserToken object to be saved
+        UserToken newUserToken = UserToken.builder()
+                .ownerEmail(user.getEmail())
+                .type(TokenType.REFRESH)
+                .value(jwtTokens.get(TokenType.REFRESH))
+                .build();
+
+        // 5. Saving new persistedUserToken
+        tokenService.saveToken(newUserToken);
+
+        //TODO not sure if this must be done
+        // 6. Revoke the used token
+        tokenService.revokeToken(persistedUserToken);
+
+        return buildAuthResponseOk(jwtTokens, "Refreshed successful");
+    }
 }

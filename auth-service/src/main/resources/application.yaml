@@ -36,7 +36,7 @@ application:
       access-token:
         expiration: 60000
       refresh-token:
-        expiration: 604800000
+        expiration: 1800000
 
 user-service:
   health-check:

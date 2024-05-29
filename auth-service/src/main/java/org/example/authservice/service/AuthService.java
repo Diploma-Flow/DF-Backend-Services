@@ -19,7 +19,7 @@ public interface AuthService {
 
     AuthenticationResponse<Void> validate(String jwtToken);
 
-//    AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest);
-//
+    AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest);
+
 //    AuthenticationResponse<Void> logout(LogoutRequest logoutRequest);
 }

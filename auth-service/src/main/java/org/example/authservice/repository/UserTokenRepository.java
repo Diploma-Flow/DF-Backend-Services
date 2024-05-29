@@ -12,6 +12,8 @@ import java.util.Optional;
  */
 public interface UserTokenRepository extends MongoRepository<UserToken, String> {
 
+    Optional<UserToken> findByValue(String jwtToken);
+
 //    @Query("{ 'ownerEmail' : ?0 }")
 //    Optional<UserToken> findByOwnerEmail(String ownerEmail);
 //
