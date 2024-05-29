@@ -1,14 +1,13 @@
 package org.example.authservice.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.authservice.dto.Token;
+import org.example.authservice.enums.TokenType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
 
 /**
  * Author: Simeon Popov
@@ -18,15 +17,19 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Document(collection = "user-tokens")
-public class UserTokens {
+public class UserToken {
 
     @Id
     private String id;
 
-    @Indexed(unique = true)
+    @Indexed
     private String ownerEmail;
 
-    private List<Token> accessTokens;
-    private Token refreshToken;
+    private TokenType type;
+    private String value;
+
+    @Builder.Default
+    private boolean isRevoked = false;
 }

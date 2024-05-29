@@ -45,34 +45,34 @@ public class AuthController {
         return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
-    //TODO
-    @PostMapping("/logout")
-    public ResponseEntity<AuthenticationResponse<Void>> logout(@RequestBody LogoutRequest logoutRequest){
-        final String methodName = "logout";
-        log.entering(SOURCE_CLASS, methodName);
-
-        AuthenticationResponse<Void> authServiceResponse = authService.logout(logoutRequest);
-        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
-    }
-
-    //TODO
-    @PostMapping("/validate")
-    public ResponseEntity<AuthenticationResponse<Void>> validate(@RequestBody String jwtToken){
-        final String methodName = "validate";
-        log.entering(SOURCE_CLASS, methodName);
-
-        AuthenticationResponse<Void> authServiceResponse = authService.validate(jwtToken);
-        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
-    }
-
-    //TODO
-    @PostMapping("/refresh")
-    public ResponseEntity<AuthenticationResponse<TokenData>> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
-        final String methodName = "refresh";
-        log.entering(SOURCE_CLASS, methodName);
-        log.info(refreshTokenRequest.toString());
-
-        AuthenticationResponse<TokenData> authServiceResponse = authService.refresh(refreshTokenRequest);
-        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
-    }
+//    //TODO
+//    @PostMapping("/logout")
+//    public ResponseEntity<AuthenticationResponse<Void>> logout(@RequestBody LogoutRequest logoutRequest){
+//        final String methodName = "logout";
+//        log.entering(SOURCE_CLASS, methodName);
+//
+//        AuthenticationResponse<Void> authServiceResponse = authService.logout(logoutRequest);
+//        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
+//    }
+//
+//    //TODO
+//    @PostMapping("/validate")
+//    public ResponseEntity<AuthenticationResponse<Void>> validate(@RequestBody String jwtToken){
+//        final String methodName = "validate";
+//        log.entering(SOURCE_CLASS, methodName);
+//
+//        AuthenticationResponse<Void> authServiceResponse = authService.validate(jwtToken);
+//        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
+//    }
+//
+//    //TODO
+//    @PostMapping("/refresh")
+//    public ResponseEntity<AuthenticationResponse<TokenData>> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
+//        final String methodName = "refresh";
+//        log.entering(SOURCE_CLASS, methodName);
+//        log.info(refreshTokenRequest.toString());
+//
+//        AuthenticationResponse<TokenData> authServiceResponse = authService.refresh(refreshTokenRequest);
+//        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
+//    }
 }

@@ -10,9 +10,6 @@ spring:
       username: rootuser
       password: rootpass
       auto-index-creation: true
-  devtools:
-    restart:
-      enabled: true
 
 server:
   port: 8083

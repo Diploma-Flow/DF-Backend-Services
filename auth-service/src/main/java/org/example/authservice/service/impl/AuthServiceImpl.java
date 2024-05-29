@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.example.authservice.client.UserServiceClient;
 import org.example.authservice.client.request.UserRegistrationRequest;
-import org.example.authservice.dto.Token;
 import org.example.authservice.enums.TokenType;
 import org.example.authservice.dto.User;
 import org.example.authservice.enums.UserRole;
+import org.example.authservice.model.UserToken;
 import org.example.authservice.request.LogoutRequest;
 import org.example.authservice.request.RefreshTokenRequest;
 import org.example.authservice.request.LoginRequest;
@@ -73,76 +73,91 @@ public class AuthServiceImpl implements AuthService {
         log.info("Sending login request to user-service");
 
         UserLoginResponse userLoginResponse = userServiceClient.loginUser(request);
-        User user = userLoginResponse.getUser();
+        User user = userLoginResponse.getUser(); // 1. Getting user from user-service if found
 
+        // 2. Checking if decoded pass match
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidLoginCredentialsException();
         }
 
+        // 3. Generating access/refresh tokens
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
-        tokenService.persist(user, jwtTokens);
 
+        // 4. Creating refreshToken object to be saved
+        UserToken refreshToken = UserToken.builder()
+                .ownerEmail(user.getEmail())
+                .type(TokenType.REFRESH)
+                .value(jwtTokens.get(TokenType.REFRESH))
+                .build();
+
+        // 5. Saving refreshToken
+        tokenService.saveToken(refreshToken);
+
+        // 6. If no fail till now everything is okay and return tokens to user
         return buildAuthResponseOk(jwtTokens, "Login successful");
     }
 
-    @Override
-    public AuthenticationResponse<Void> logout(LogoutRequest logoutRequest) {
-        log.info("Logging out");
-
-        String jwtAccessToken = logoutRequest.getAccessToken();
-        jwtService.notExpired(jwtAccessToken);
-        String subjectEmail = jwtService.extractEmail(jwtAccessToken);
-        tokenService.deleteTokensOf(subjectEmail);
-
-        return AuthenticationResponse.<Void>builder()
-                .httpStatus(HttpStatus.OK)
-                .response("Logout successful")
-                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
-                .build();
-    }
-
-    @Override
-    public AuthenticationResponse<Void> validate(String jwtToken) {
-        log.info("Validating jwt token");
-
-        //notExpired throws an error if expired
-        jwtService.notExpired(jwtToken);
-        String subjectEmail = jwtService.extractEmail(jwtToken);
-        Token accessToken = tokenService.findAccessTokenByValueAndEmail(jwtToken, subjectEmail);
-
-        if (accessToken.isRevoked()) {
-            throw new InvalidJwtTokenException("Token is revoked.");
-        }
-
-        return AuthenticationResponse.<Void>builder()
-                .httpStatus(HttpStatus.OK)
-                .response("SUCCESS")
-                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
-                .build();
-    }
-
-    @Override
-    public AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest) {
-        log.info("Refreshing jwt tokens");
-
-        String jwtToken = refreshTokenRequest.getRefreshToken();
-        jwtService.notExpired(jwtToken);
-        String subjectEmail = jwtService.extractEmail(jwtToken);
-        UserRole userRole = jwtService.extractUserRole(jwtToken);
-        Token refreshToken = tokenService.findRefreshTokenByValueAndEmail(jwtToken, subjectEmail);
-
-        if (refreshToken.isRevoked()) {
-            throw new InvalidJwtTokenException("Token is revoked.");
-        }
-
-        User user = User.builder()
-                .role(userRole)
-                .email(subjectEmail)
-                .build();
-
-        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
-        tokenService.updateTokens(subjectEmail, jwtTokens);
-
-        return buildAuthResponseOk(jwtTokens, "Refreshed successful");
-    }
+//    //TODO logout
+//    @Override
+//    public AuthenticationResponse<Void> logout(LogoutRequest logoutRequest) {
+//        log.info("Logging out");
+//
+//        String jwtAccessToken = logoutRequest.getAccessToken();
+//        jwtService.notExpired(jwtAccessToken);
+//        String subjectEmail = jwtService.extractEmail(jwtAccessToken);
+//        tokenService.deleteTokensOf(subjectEmail);
+//
+//        return AuthenticationResponse.<Void>builder()
+//                .httpStatus(HttpStatus.OK)
+//                .response("Logout successful")
+//                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
+//                .build();
+//    }
+//
+//    //TODO validate
+//    @Override
+//    public AuthenticationResponse<Void> validate(String jwtToken) {
+//        log.info("Validating jwt token");
+//
+//        //notExpired throws an error if expired
+//        jwtService.notExpired(jwtToken);
+//        String subjectEmail = jwtService.extractEmail(jwtToken);
+//        Token accessToken = tokenService.findAccessTokenByValueAndEmail(jwtToken, subjectEmail);
+//
+//        if (accessToken.isRevoked()) {
+//            throw new InvalidJwtTokenException("Token is revoked.");
+//        }
+//
+//        return AuthenticationResponse.<Void>builder()
+//                .httpStatus(HttpStatus.OK)
+//                .response("SUCCESS")
+//                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
+//                .build();
+//    }
+//
+//    //TODO refresh
+//    @Override
+//    public AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest) {
+//        log.info("Refreshing jwt tokens");
+//
+//        String jwtToken = refreshTokenRequest.getRefreshToken();
+//        jwtService.notExpired(jwtToken);
+//        String subjectEmail = jwtService.extractEmail(jwtToken);
+//        UserRole userRole = jwtService.extractUserRole(jwtToken);
+//        Token refreshToken = tokenService.findRefreshTokenByValueAndEmail(jwtToken, subjectEmail);
+//
+//        if (refreshToken.isRevoked()) {
+//            throw new InvalidJwtTokenException("Token is revoked.");
+//        }
+//
+//        User user = User.builder()
+//                .role(userRole)
+//                .email(subjectEmail)
+//                .build();
+//
+//        Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
+//        tokenService.updateTokens(subjectEmail, jwtTokens);
+//
+//        return buildAuthResponseOk(jwtTokens, "Refreshed successful");
+//    }
 }
