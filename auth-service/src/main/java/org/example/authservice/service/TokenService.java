@@ -18,4 +18,6 @@ public interface TokenService {
     void verifyNotRevoked(UserToken userToken) throws TokenRevokedException;
 
     void revokeToken(UserToken userToken);
+
+    void revokeAllOwnedBy(String subjectEmail);
 }

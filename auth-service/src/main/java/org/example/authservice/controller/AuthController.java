@@ -45,15 +45,15 @@ public class AuthController {
         return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
-//    //TODO
-//    @PostMapping("/logout")
-//    public ResponseEntity<AuthenticationResponse<Void>> logout(@RequestBody LogoutRequest logoutRequest){
-//        final String methodName = "logout";
-//        log.entering(SOURCE_CLASS, methodName);
-//
-//        AuthenticationResponse<Void> authServiceResponse = authService.logout(logoutRequest);
-//        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
-//    }
+    //TODO
+    @PostMapping("/logout")
+    public ResponseEntity<AuthenticationResponse<Void>> logout(@RequestBody LogoutRequest logoutRequest){
+        final String methodName = "logout";
+        log.entering(SOURCE_CLASS, methodName);
+
+        AuthenticationResponse<Void> authServiceResponse = authService.logout(logoutRequest);
+        return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
+    }
 
     //TODO
     @PostMapping("/validate")

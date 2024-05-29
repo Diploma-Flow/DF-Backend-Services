@@ -4,6 +4,7 @@ import org.example.authservice.model.UserToken;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -14,10 +15,7 @@ public interface UserTokenRepository extends MongoRepository<UserToken, String> 
 
     Optional<UserToken> findByValue(String jwtToken);
 
-//    @Query("{ 'ownerEmail' : ?0 }")
-//    Optional<UserToken> findByOwnerEmail(String ownerEmail);
-//
-//    UserToken deleteUserTokensByOwnerEmail(String ownerEmail);
-//
-//    boolean existsByOwnerEmail(String ownerEmail);
+    List<UserToken> findByOwnerEmail(String ownerEmail);
+
+    List<UserToken> findByOwnerEmailAndIsRevokedFalse(String ownerEmail);
 }

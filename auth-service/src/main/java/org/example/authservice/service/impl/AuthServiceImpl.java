@@ -10,6 +10,7 @@ import org.example.authservice.dto.User;
 import org.example.authservice.enums.UserRole;
 import org.example.authservice.model.UserToken;
 import org.example.authservice.request.LoginRequest;
+import org.example.authservice.request.LogoutRequest;
 import org.example.authservice.request.RefreshTokenRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.client.response.UserLoginResponse;
@@ -116,22 +117,24 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-//    //TODO logout
-//    @Override
-//    public AuthenticationResponse<Void> logout(LogoutRequest logoutRequest) {
-//        log.info("Logging out");
-//
-//        String jwtAccessToken = logoutRequest.getAccessToken();
-//        jwtService.notExpired(jwtAccessToken);
-//        String subjectEmail = jwtService.extractEmail(jwtAccessToken);
-//        tokenService.deleteTokensOf(subjectEmail);
-//
-//        return AuthenticationResponse.<Void>builder()
-//                .httpStatus(HttpStatus.OK)
-//                .response("Logout successful")
-//                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
-//                .build();
-//    }
+    //TODO logout
+    @Override
+    public AuthenticationResponse<Void> logout(LogoutRequest logoutRequest) {
+        log.info("Logging out");
+
+        String providedAccessToken = logoutRequest.getAccessToken();
+        jwtService.checkNotExpired(providedAccessToken);
+        jwtService.verifyAccessTokenType(providedAccessToken);
+
+        String subjectEmail = jwtService.extractEmail(providedAccessToken);
+        tokenService.revokeAllOwnedBy(subjectEmail);
+
+        return AuthenticationResponse.<Void>builder()
+                .httpStatus(HttpStatus.OK)
+                .response("Logout successful")
+                .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
+                .build();
+    }
 
     //TODO refresh
     @Override
@@ -155,7 +158,6 @@ public class AuthServiceImpl implements AuthService {
                 .email(subjectEmail)
                 .build();
 
-        //TODO not sure if a new refresh is needed or just to let it expire and then new authentication
         // 3. Generating access/refresh tokens
         Map<TokenType, String> jwtTokens = jwtService.generateJwtTokens(user);
 
@@ -169,7 +171,6 @@ public class AuthServiceImpl implements AuthService {
         // 5. Saving new persistedUserToken
         tokenService.saveToken(newUserToken);
 
-        //TODO not sure if this must be done
         // 6. Revoke the used token
         tokenService.revokeToken(persistedUserToken);
 

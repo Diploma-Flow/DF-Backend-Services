@@ -58,14 +58,6 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiException, httpStatus);
     }
 
-    @ExceptionHandler(UserRegistrationException.class)
-    public ResponseEntity<Object> handleUserRegistrationException(UserRegistrationException e) {
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
-
-        return new ResponseEntity<>(apiException, httpStatus);
-    }
-
     @ExceptionHandler(UserLoginException.class)
     public ResponseEntity<Object> handleUserLoginException(UserLoginException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
@@ -93,14 +85,6 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UserAlreadyLoggedOutException.class)
     public ResponseEntity<Object> handleUserAlreadyLoggedOutException(UserAlreadyLoggedOutException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        ApiException apiException = apiExceptionFactory.generateApiException(e.getMessage(), httpStatus);
-
-        return new ResponseEntity<>(apiException, httpStatus);
-    }
-
-    @ExceptionHandler(UserJwtTokensNotFoundException.class)
-    public ResponseEntity<Object> handleUserJwtTokensNotFoundException(UserJwtTokensNotFoundException e) {
-        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
         ApiException apiException = apiExceptionFactory.generateApiException(e.getMessage(), httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);
