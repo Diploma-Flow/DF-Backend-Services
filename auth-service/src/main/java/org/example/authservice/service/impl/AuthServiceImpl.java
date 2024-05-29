@@ -102,6 +102,8 @@ public class AuthServiceImpl implements AuthService {
 
         //checkNotExpired throws an error if expired
         jwtService.checkNotExpired(jwtToken);
+
+        //verifyAccessTokenType throws InvalidJwtTokenException if provided jwtToken NOT access type
         jwtService.verifyAccessTokenType(jwtToken);
 
         //! Note that here a revocation is NOT needed because the access token has a small-time of expiration
