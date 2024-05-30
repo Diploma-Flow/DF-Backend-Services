@@ -71,6 +71,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthenticationResponse<TokenData> login(LoginRequest request) {
         log.info("Sending login request to user-service");
+        //FIXME OPTION1: check if this user has not revoked refresh tokens and if that the case get them
+        // and check if they are expired if thats the case the user is still logged in and throw exception
+
+        //FIXME OPTION2: Save both tokens as a object with both tokens in the DB to have the option to revoke based on the accessToken
 
         UserLoginResponse userLoginResponse = userServiceClient.loginUser(request);
         User user = userLoginResponse.getUser(); // 1. Getting user from user-service if found
@@ -97,7 +101,6 @@ public class AuthServiceImpl implements AuthService {
         return buildAuthResponseOk(jwtTokens, "Login successful");
     }
 
-        //TODO validate
     @Override
     public AuthenticationResponse<Void> validate(String jwtToken) {
         log.info("Validating jwt token");
@@ -117,7 +120,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    //TODO logout
     @Override
     public AuthenticationResponse<Void> logout(LogoutRequest logoutRequest) {
         log.info("Logging out");
@@ -136,7 +138,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    //TODO refresh
     @Override
     public AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest) {
         log.info("Refreshing jwt tokens");

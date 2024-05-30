@@ -45,7 +45,6 @@ public class AuthController {
         return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
-    //TODO
     @PostMapping("/logout")
     public ResponseEntity<AuthenticationResponse<Void>> logout(@RequestBody LogoutRequest logoutRequest){
         final String methodName = "logout";
@@ -55,7 +54,6 @@ public class AuthController {
         return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
-    //TODO
     @PostMapping("/validate")
     public ResponseEntity<AuthenticationResponse<Void>> validate(@RequestBody String jwtToken){
         final String methodName = "validate";
@@ -65,7 +63,6 @@ public class AuthController {
         return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 
-    //TODO
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse<TokenData>> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
         final String methodName = "refresh";
