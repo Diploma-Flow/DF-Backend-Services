@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.authservice.enums.UserRole;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -15,7 +16,7 @@ import org.springframework.http.HttpStatus;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class JwtValidationResponse {
-    private String response;
-    private HttpStatus httpStatus;
+public class PrincipalDetails {
+    private String userEmail;
+    private UserRole userRole;
 }

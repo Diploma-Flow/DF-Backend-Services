@@ -7,7 +7,7 @@ import org.example.authservice.request.RefreshTokenRequest;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
-import org.example.authservice.response.JwtValidationResponse;
+import org.example.authservice.response.PrincipalDetails;
 import org.example.authservice.response.TokenData;
 import org.example.authservice.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -55,11 +55,11 @@ public class AuthController {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<AuthenticationResponse<Void>> validate(@RequestBody String jwtToken){
+    public ResponseEntity<AuthenticationResponse<PrincipalDetails>> validate(@RequestBody String jwtToken){
         final String methodName = "validate";
         log.entering(SOURCE_CLASS, methodName);
 
-        AuthenticationResponse<Void> authServiceResponse = authService.validate(jwtToken);
+        AuthenticationResponse<PrincipalDetails> authServiceResponse = authService.validate(jwtToken);
         return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 

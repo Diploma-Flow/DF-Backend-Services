@@ -5,7 +5,7 @@ import org.example.authservice.request.RefreshTokenRequest;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.RegisterRequest;
 import org.example.authservice.response.AuthenticationResponse;
-import org.example.authservice.response.JwtValidationResponse;
+import org.example.authservice.response.PrincipalDetails;
 import org.example.authservice.response.TokenData;
 
 /**
@@ -17,7 +17,7 @@ public interface AuthService {
 
     AuthenticationResponse<TokenData> login(LoginRequest request);
 
-    AuthenticationResponse<Void> validate(String jwtToken);
+    AuthenticationResponse<PrincipalDetails> validate(String jwtToken);
 
     AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest);
 

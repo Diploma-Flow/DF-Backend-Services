@@ -18,6 +18,7 @@ import org.example.authservice.client.response.UserRegistrationResponse;
 import org.example.authservice.exception.exceptions.InvalidJwtTokenException;
 import org.example.authservice.exception.exceptions.InvalidLoginCredentialsException;
 import org.example.authservice.response.AuthenticationResponse;
+import org.example.authservice.response.PrincipalDetails;
 import org.example.authservice.response.TokenData;
 import org.example.authservice.service.AuthService;
 import org.example.authservice.service.JwtService;
@@ -102,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse<Void> validate(String jwtToken) {
+    public AuthenticationResponse<PrincipalDetails> validate(String jwtToken) {
         log.info("Validating jwt token");
 
         //checkNotExpired throws an error if expired
@@ -113,9 +114,16 @@ public class AuthServiceImpl implements AuthService {
 
         //! Note that here a revocation is NOT needed because the access token has a small-time of expiration
 
-        return AuthenticationResponse.<Void>builder()
+        //TODO get username
+        String userEmail = jwtService.extractEmail(jwtToken);
+
+        //TODO get roles
+        UserRole userRole = jwtService.extractUserRole(jwtToken);
+
+        return AuthenticationResponse.<PrincipalDetails>builder()
                 .httpStatus(HttpStatus.OK)
                 .response("SUCCESS")
+                .data(new PrincipalDetails(userEmail, userRole))
                 .timestamp(ZonedDateTime.now(ZoneId.of("Z")))
                 .build();
     }

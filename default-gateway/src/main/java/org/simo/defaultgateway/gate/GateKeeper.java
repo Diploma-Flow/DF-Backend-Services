@@ -1,30 +1,30 @@
-package org.simo.defaultgateway.filters;
+package org.simo.defaultgateway.gate;
 
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.simo.defaultgateway.service.RouteValidatorService;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
  * Author: Simeon Popov
- * Date of creation: 7.4.2024 г.
+ * Date of creation: 6/6/2024
  */
 
 @Log4j2
-@Component
 @RequiredArgsConstructor
-public class CustomGlobalFilter implements GlobalFilter, Ordered {
+public abstract class GateKeeper implements GlobalFilter, Ordered {
     private final RouteValidatorService routeValidatorService;
-    private final AuthenticationFilter authenticationFilter;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.trace("ENTERING: CustomGlobalFilter");
+        log.trace("ENTERING: Access checking");
+
         String path = exchange
                 .getRequest()
                 .getPath()
@@ -35,16 +35,13 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         log.info("Request path: {} is Public: {}", path, isPublic);
 
         if (isPublic) {
-            log.info("Request forwarded to normal filter flow");
+            log.info("Request forwarded to PUBLIC filter flow");
             return chain.filter(exchange);
         }
 
-        log.info("Request forwarded to authentication filter");
-        return authenticationFilter.filter(exchange, chain);
+        log.info("Request forwarded to PRIVATE filter flow");
+        return doFilter(exchange, chain);
     }
 
-    @Override
-    public int getOrder() {
-        return -1;
-    }
+    protected abstract Mono<Void> doFilter(ServerWebExchange exchange, GatewayFilterChain chain);
 }
