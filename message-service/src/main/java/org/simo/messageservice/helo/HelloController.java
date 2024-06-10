@@ -1,6 +1,8 @@
 package org.simo.messageservice.helo;
 
 import lombok.extern.log4j.Log4j2;
+import org.simo.messageservice.context.RequestContext;
+import org.simo.messageservice.context.RequestContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +24,11 @@ public class HelloController {
     }
 
     @GetMapping("/testing")
-    public String getTesting(@RequestHeader("X-User-Email") String userEmail,
-                             @RequestHeader("X-User-Role") String userRole) {
-        log.info("Reached message service controller.");
+    public String getTesting() {
+        RequestContext requestContext = RequestContextHolder.getContext();
+        String userEmail = requestContext.getUserEmail();
+        String userRole = requestContext.getUserRole();
+
         log.info("X-User-Email: {}", userEmail);
         log.info("X-User-Role: {}", userRole);
         return "Hello from message service";
