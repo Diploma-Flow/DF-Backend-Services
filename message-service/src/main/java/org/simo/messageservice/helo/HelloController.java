@@ -22,8 +22,11 @@ public class HelloController {
     }
 
     @GetMapping("/testing")
-    public String getTesting(){
+    public String getTesting(@RequestHeader("X-User-Email") String userEmail,
+                             @RequestHeader("X-User-Role") String userRole) {
         log.info("Reached message service controller.");
+        log.info("X-User-Email: {}", userEmail);
+        log.info("X-User-Role: {}", userRole);
         return "Hello from message service";
     }
 }

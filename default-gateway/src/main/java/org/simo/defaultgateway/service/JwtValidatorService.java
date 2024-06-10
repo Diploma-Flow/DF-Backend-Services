@@ -71,24 +71,24 @@ public class JwtValidatorService {
         };
     }
 
-    public Function<JwtValidationResponse, Mono<? extends Void>> processValidationResult(ServerWebExchange exchange, GatewayFilterChain chain) {
-        return response -> {
-            HttpStatus responseHttpStatus = response.getHttpStatus();
-
-            if (responseHttpStatus.is2xxSuccessful()) {
-                log.info("JWT is valid");
-                return chain.filter(exchange);
-            }
-
-            String errorMessage = "Unexpected response status from user-service: " + responseHttpStatus;
-
-            if (responseHttpStatus.is4xxClientError()) {
-                errorMessage = response.getResponse();
-                log.warn(errorMessage);
-                throw new JwtValidationException(errorMessage);
-            }
-
-            throw new RuntimeException(errorMessage);
-        };
-    }
+//    public Function<JwtValidationResponse, Mono<? extends Void>> processValidationResult(ServerWebExchange exchange, GatewayFilterChain chain) {
+//        return response -> {
+//            HttpStatus responseHttpStatus = response.getHttpStatus();
+//
+//            if (responseHttpStatus.is2xxSuccessful()) {
+//                log.info("JWT is valid");
+//                return chain.filter(exchange);
+//            }
+//
+//            String errorMessage = "Unexpected response status from user-service: " + responseHttpStatus;
+//
+//            if (responseHttpStatus.is4xxClientError()) {
+//                errorMessage = response.getResponse();
+//                log.warn(errorMessage);
+//                throw new JwtValidationException(errorMessage);
+//            }
+//
+//            throw new RuntimeException(errorMessage);
+//        };
+//    }
 }
