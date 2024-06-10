@@ -39,7 +39,9 @@ public class JwtValidationFilter extends GateKeeper {
         String jwtToken = headerService.getJwtFromHeader(authHeader);
 
         Mono<JwtValidationResponse> jwtValidationResponseMono = jwtValidatorService.isJwtValid(jwtToken);
-        return jwtValidationResponseMono.flatMap(jwtValidatorService.processValidationResult(exchange, chain));
+        Mono<Void> voidMono = jwtValidationResponseMono.flatMap(jwtValidatorService.processValidationResult(exchange, chain));
+
+        return voidMono;
     }
 
     @Override
