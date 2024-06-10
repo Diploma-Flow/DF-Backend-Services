@@ -62,7 +62,9 @@ public class JwtValidatorService {
 
             //responses with status '4xx' are mapped for later processing the reason of the client error
             if (httpStatusCode.is2xxSuccessful() || httpStatusCode.is4xxClientError()) {
-                return response.bodyToMono(JwtValidationResponse.class);
+                Mono<JwtValidationResponse> jwtValidationResponseMono = response.bodyToMono(JwtValidationResponse.class);
+
+                return jwtValidationResponseMono.doOnNext(jwtResponse -> log.info("Response from user-service {}",jwtResponse));
             }
 
             throw new RuntimeException("Unexpected response status from user-service: " + httpStatusCode);

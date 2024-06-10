@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
-
-import java.time.ZonedDateTime;
+import org.simo.defaultgateway.enums.UserRole;
 
 /**
  * Author: Simeon Popov
@@ -17,9 +15,7 @@ import java.time.ZonedDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class JwtValidationResponse {
-    private String response;
-    private HttpStatus httpStatus;
-    private PrincipalDetails data;
-    private ZonedDateTime timestamp;
+public class PrincipalDetails {
+    private String userEmail;
+    private UserRole userRole;
 }
