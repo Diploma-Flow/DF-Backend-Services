@@ -3,11 +3,13 @@ package org.example.authservice.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang.StringUtils;
 import org.example.authservice.client.UserServiceClient;
 import org.example.authservice.client.request.UserRegistrationRequest;
 import org.example.authservice.enums.TokenType;
 import org.example.authservice.dto.User;
 import org.example.authservice.enums.UserRole;
+import org.example.authservice.exception.exceptions.HeaderValidationException;
 import org.example.authservice.model.UserToken;
 import org.example.authservice.request.LoginRequest;
 import org.example.authservice.request.LogoutRequest;
@@ -129,10 +131,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse<Void> logout(LogoutRequest logoutRequest) {
+    public AuthenticationResponse<Void> logout(String authorizationHeader) {
         log.info("Logging out");
 
-        String providedAccessToken = logoutRequest.getAccessToken();
+        String providedAccessToken = jwtService.getJwtFromHeader(authorizationHeader);
         jwtService.checkNotExpired(providedAccessToken);
         jwtService.verifyAccessTokenType(providedAccessToken);
 

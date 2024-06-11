@@ -6,9 +6,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
+import org.apache.commons.lang.StringUtils;
 import org.example.authservice.enums.TokenType;
 import org.example.authservice.dto.User;
 import org.example.authservice.enums.UserRole;
+import org.example.authservice.exception.exceptions.HeaderValidationException;
 import org.example.authservice.exception.exceptions.InvalidJwtTokenException;
 import org.example.authservice.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +30,8 @@ import java.util.function.Function;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    public static final int BEARER_LENGTH = 7;
+    public static final String BEARER_PREFIX = "Bearer ";
+    private static final String JWT_VALIDATION_REGEX = "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_.+/=]*$";
 
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
@@ -39,8 +42,27 @@ public class JwtServiceImpl implements JwtService {
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshTokenExpiration;
 
-    public static String extractTokenFromHeader(String header) {
-        return header.substring(BEARER_LENGTH);
+    @Override
+    public String getJwtFromHeader(String authHeader) {
+        validateAuthHeaderNotBlank(authHeader);
+
+        if (!authHeader.startsWith(BEARER_PREFIX)) {
+            throw new HeaderValidationException("Bearer token is missing");
+        }
+
+        String token = authHeader.substring(BEARER_PREFIX.length());
+
+        if (!token.matches(JWT_VALIDATION_REGEX)) {
+            throw new HeaderValidationException("JWT format is NOT valid");
+        }
+
+        return token;
+    }
+
+    private static void validateAuthHeaderNotBlank(String authHeader) {
+        if (StringUtils.isBlank(authHeader)) {
+            throw new HeaderValidationException("Authorization header is empty");
+        }
     }
 
     @Override

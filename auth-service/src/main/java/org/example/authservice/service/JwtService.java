@@ -30,5 +30,8 @@ public interface JwtService {
     UserRole extractUserRole(String jsonWebToken);
 
     void verifyAccessTokenType(String jwtToken);
+
     void verifyRefreshTokenType(String jwtToken);
+
+    String getJwtFromHeader(String authHeader);
 }

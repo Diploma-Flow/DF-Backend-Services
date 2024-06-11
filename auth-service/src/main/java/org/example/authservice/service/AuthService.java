@@ -21,5 +21,5 @@ public interface AuthService {
 
     AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest);
 
-    AuthenticationResponse<Void> logout(LogoutRequest logoutRequest);
+    AuthenticationResponse<Void> logout(String authorizationHeader);
 }

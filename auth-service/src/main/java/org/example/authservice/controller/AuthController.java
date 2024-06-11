@@ -46,11 +46,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthenticationResponse<Void>> logout(@RequestBody LogoutRequest logoutRequest){
+    public ResponseEntity<AuthenticationResponse<Void>> logout(@RequestHeader("Authorization") String authorizationHeader){
         final String methodName = "logout";
         log.entering(SOURCE_CLASS, methodName);
 
-        AuthenticationResponse<Void> authServiceResponse = authService.logout(logoutRequest);
+        AuthenticationResponse<Void> authServiceResponse = authService.logout(authorizationHeader);
         return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 

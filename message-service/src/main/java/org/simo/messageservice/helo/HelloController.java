@@ -18,11 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/message")
 public class HelloController {
 
-    @GetMapping("/hello")
-    public String getHello(@RequestHeader("token-X") String token){
-        return "Hello from message service controller. with token: " + token;
-    }
-
     @GetMapping("/testing")
     public String getTesting() {
         RequestContext requestContext = RequestContextHolder.getContext();
