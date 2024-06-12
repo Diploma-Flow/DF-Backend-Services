@@ -149,10 +149,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse<TokenData> refresh(RefreshTokenRequest refreshTokenRequest) {
+    public AuthenticationResponse<TokenData> refresh(String authorizationHeader) {
         log.info("Refreshing jwt tokens");
 
-        String providedRefreshToken = refreshTokenRequest.getRefreshToken();
+        String providedRefreshToken = jwtService.getJwtFromHeader(authorizationHeader);
 
         jwtService.checkNotExpired(providedRefreshToken);
         jwtService.verifyRefreshTokenType(providedRefreshToken);

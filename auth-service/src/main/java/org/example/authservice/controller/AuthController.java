@@ -64,11 +64,11 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthenticationResponse<TokenData>> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
+    public ResponseEntity<AuthenticationResponse<TokenData>> refresh(@RequestHeader("Authorization") String authorizationHeader){
         final String methodName = "refresh";
         log.entering(SOURCE_CLASS, methodName);
 
-        AuthenticationResponse<TokenData> authServiceResponse = authService.refresh(refreshTokenRequest);
+        AuthenticationResponse<TokenData> authServiceResponse = authService.refresh(authorizationHeader);
         return ResponseEntity.status(authServiceResponse.getHttpStatus()).body(authServiceResponse);
     }
 }
