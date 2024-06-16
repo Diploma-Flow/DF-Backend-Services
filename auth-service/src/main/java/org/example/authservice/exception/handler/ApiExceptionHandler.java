@@ -53,7 +53,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException e) {
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-        ApiException apiException = apiExceptionFactory.generateApiException(e, httpStatus);
+        ApiException apiException = apiExceptionFactory.generateApiException("TOKEN EXPIRED", httpStatus);
 
         return new ResponseEntity<>(apiException, httpStatus);
     }
