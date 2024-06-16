@@ -1,10 +1,9 @@
 package org.simo.messageservice.helo;
 
 import lombok.extern.log4j.Log4j2;
-import org.simo.messageservice.context.RequestContext;
-import org.simo.messageservice.context.RequestContextHolder;
+import org.simo.auth.context.provider.RequestContext;
+import org.simo.auth.context.provider.RequestContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

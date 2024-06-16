@@ -19,3 +19,11 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+logging:
+  level:
+    org:
+      simo:
+        auth:
+          context:
+            provider: DEBUG

@@ -8,11 +8,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="auth-service" />
-        <module name="user-service" />
         <module name="default-gateway" />
+        <module name="user-service" />
         <module name="message-service" />
         <module name="eureka-server" />
-        <module name="auth-service-v2" />
+        <module name="auth-context" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -21,6 +21,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="auth-context" options="-parameters" />
       <module name="auth-service" options="-parameters" />
       <module name="auth-service-v2" options="-parameters" />
       <module name="default-gateway" options="-parameters" />
