@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  diploma-management-db:
+    image: mysql:latest
+    container_name: diploma-management-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secretPassword
+      MYSQL_DATABASE: DiplomaManagement
+    ports:
+      - "3307:3306"
+    volumes:
+      - diploma-management-data:/var/lib/mysql
+
+volumes:
+  diploma-management-data: {}

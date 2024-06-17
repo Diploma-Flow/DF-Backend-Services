@@ -22,6 +22,9 @@ public class DefaultGatewayApplication {
                 .route("message-service", r -> r.path("/message/**")
                         .uri("lb://MESSAGE-SERVICE"))
 
+                .route("diploma-management-service", r -> r.path("/diploma-management/**")
+                        .uri("lb://DIPLOMA-MANAGEMENT-SERVICE"))
+
                 .route("user-service", r -> r.path("/user/**")
                         .uri("lb://USER-SERVICE"))
 

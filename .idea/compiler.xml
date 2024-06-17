@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="auth-service" />
         <module name="default-gateway" />
+        <module name="diploma-management-service" />
         <module name="user-service" />
         <module name="message-service" />
         <module name="eureka-server" />
@@ -26,6 +27,7 @@
       <module name="auth-service-v2" options="-parameters" />
       <module name="default-gateway" options="-parameters" />
       <module name="demo" options="-parameters" />
+      <module name="diploma-management-service" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="message-service" options="-parameters" />
       <module name="user-service" options="-parameters" />

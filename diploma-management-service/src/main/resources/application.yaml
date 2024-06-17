@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: diploma-management-service
+
+  datasource:
+    url: jdbc:mysql://host.docker.internal:3307/DiplomaManagement
+    username: root
+    password: secretPassword
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8084
+
+logging:
+  level:
+    org:
+      simo:
+        auth:
+          context:
+            provider: DEBUG
