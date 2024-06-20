@@ -25,3 +25,5 @@ logging:
         auth:
           context:
             provider: DEBUG
+      hibernate:
+        id: TRACE

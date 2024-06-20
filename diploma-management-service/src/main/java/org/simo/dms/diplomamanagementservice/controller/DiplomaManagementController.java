@@ -1,13 +1,14 @@
 package org.simo.dms.diplomamanagementservice.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.simo.auth.context.provider.RequestContext;
-import org.simo.auth.context.provider.RequestContextHolder;
+import org.simo.dms.diplomamanagementservice.request.CreateDiplomaApplication;
+import org.simo.dms.diplomamanagementservice.response.DiplomaApplicationDto;
+import org.simo.dms.diplomamanagementservice.service.DiplomaApplicationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Author: Simeon Popov
@@ -17,16 +18,56 @@ import org.springframework.web.bind.annotation.RestController;
 @Log4j2
 @RestController
 @RequestMapping("/diploma-management")
+@RequiredArgsConstructor
 public class DiplomaManagementController {
 
-    @GetMapping("/test")
-    public ResponseEntity<String> testContext(){
-        RequestContext requestContext = RequestContextHolder.getContext();
-        String userEmail = requestContext.getUserEmail();
-        String userRole = requestContext.getUserRole();
+    private final DiplomaApplicationService diplomaApplicationService;
 
-        log.info("X-User-Email: {}", userEmail);
-        log.info("X-User-Role: {}", userRole);
-        return ResponseEntity.ok("Hello from diploma management service");
+    @PostMapping("/create-application")
+    public ResponseEntity<DiplomaApplicationDto> createDiplomaApplication(@RequestBody CreateDiplomaApplication request){
+        DiplomaApplicationDto diplomaApplication = diplomaApplicationService.createDiplomaApplication(request);
+
+        return ResponseEntity.ok().body(diplomaApplication);
     }
+
+    @PostMapping("/send-for-approval")
+    public ResponseEntity<?> sendDiplomaApplicationForApproval(@RequestParam("id") String applicationId){
+        diplomaApplicationService.sendDiplomaApplicationForApproval(applicationId);
+        return ResponseEntity.ok().body("Successfully SENT Diploma Application");
+    }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancelDiplomaApplication(@RequestParam("id") String applicationId){
+        diplomaApplicationService.cancelDiplomaApplication(applicationId);
+        return ResponseEntity.ok().body("Successfully CANCELED the Diploma Application");
+    }
+
+    @PostMapping("/reject")
+    public ResponseEntity<?> rejectDiplomaApplication(@RequestParam("id") String applicationId){
+        diplomaApplicationService.rejectDiplomaApplication(applicationId);
+        return ResponseEntity.ok().body("Successfully REJECTED the Diploma Application");
+    }
+
+    @PostMapping("/accept")
+    public ResponseEntity<?> acceptDiplomaApplication(@RequestParam("id") String applicationId){
+        diplomaApplicationService.acceptDiplomaApplication(applicationId);
+        return ResponseEntity.ok().body("Successfully ACCEPTED the Diploma Application");
+    }
+
+    @PostMapping("/re-open")
+    public ResponseEntity<?> reOpenDiplomaApplication(@RequestParam("id") String applicationId){
+        diplomaApplicationService.reOpenDiplomaApplication(applicationId);
+        return ResponseEntity.ok().body("Successfully REOPENED the Diploma Application");
+    }
+
+    @GetMapping("/get-by-user")
+    public ResponseEntity<List<DiplomaApplicationDto>> getDiplomaApplicationsOfUser(){
+        List<DiplomaApplicationDto> applicationsOfUser = diplomaApplicationService.getDiplomaApplicationsOfUser();
+        return ResponseEntity.ok().body(applicationsOfUser);
+    }
+
+//    @GetMapping()
+//    public ResponseEntity<List<?>> getAllDiplomaApplications(){
+//        return ResponseEntity.ok().build();
+//    }
 }
