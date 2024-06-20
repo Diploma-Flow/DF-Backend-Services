@@ -12,6 +12,8 @@ import org.simo.dms.diplomamanagementservice.model.DiplomaApplication;
 import org.simo.dms.diplomamanagementservice.repository.DiplomaApplicationRepository;
 import org.simo.dms.diplomamanagementservice.request.CreateDiplomaApplication;
 import org.simo.dms.diplomamanagementservice.response.DiplomaApplicationDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -229,7 +231,8 @@ public class DiplomaApplicationService {
         return diplomaApplicationDtos;
     }
 
-    public List<?> getAllDiplomaApplications(){
-        return null;
+    public Page<DiplomaApplication> getAllDiplomaApplications(PageRequest pageRequest){
+        Page<DiplomaApplication> page = diplomaApplicationRepository.findAll(pageRequest);
+        return page;
     }
 }

@@ -2,9 +2,12 @@ package org.simo.dms.diplomamanagementservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.simo.dms.diplomamanagementservice.model.DiplomaApplication;
 import org.simo.dms.diplomamanagementservice.request.CreateDiplomaApplication;
 import org.simo.dms.diplomamanagementservice.response.DiplomaApplicationDto;
 import org.simo.dms.diplomamanagementservice.service.DiplomaApplicationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,8 +69,10 @@ public class DiplomaManagementController {
         return ResponseEntity.ok().body(applicationsOfUser);
     }
 
-//    @GetMapping()
-//    public ResponseEntity<List<?>> getAllDiplomaApplications(){
-//        return ResponseEntity.ok().build();
-//    }
+    @GetMapping()
+    public ResponseEntity<Page<DiplomaApplication>> getAllDiplomaApplications(@RequestParam int page, @RequestParam int size){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<DiplomaApplication> diplomaApplicationPage = diplomaApplicationService.getAllDiplomaApplications(pageRequest);
+        return ResponseEntity.ok().body(diplomaApplicationPage);
+    }
 }
