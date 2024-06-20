@@ -1,6 +1,7 @@
 package org.example.userservice.service;
 
 import org.example.userservice.dto.User;
+import org.example.userservice.dto.UserDto;
 import org.example.userservice.dto.login.LoginRequest;
 import org.example.userservice.dto.login.LoginResponse;
 import org.example.userservice.dto.register.RegisterUserResponse;
@@ -14,4 +15,5 @@ public interface UserService {
 
     RegisterUserResponse register (RegisterUserRequest registerUserRequest);
     LoginResponse loginUser(LoginRequest request);
+    UserDto getUserByEmail(String userEmail);
 }

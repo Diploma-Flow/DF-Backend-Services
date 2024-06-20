@@ -2,6 +2,7 @@ package org.example.userservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.userservice.dto.User;
+import org.example.userservice.dto.UserDto;
 import org.example.userservice.dto.login.LoginRequest;
 import org.example.userservice.dto.login.LoginResponse;
 import org.example.userservice.dto.register.RegisterUserResponse;
@@ -72,6 +73,16 @@ public class UserServiceImpl implements UserService {
                 .response("Found successfully")
                 .user(new User(user.getEmail(), user.getRole(), user.getPassword()))
                 .build();
+    }
+
+    @Override
+    public UserDto getUserByEmail(String userEmail) {
+        UserAccount userAccount = userAccountRepository
+                .findByEmail(userEmail.toLowerCase())
+                .orElseThrow(UserNotFoundException::new);
+
+        UserDto userDto = modelMapper.map(userAccount, UserDto.class);
+        return userDto;
     }
 
     public String generateUniqueUsername(String firstName, String lastName) {

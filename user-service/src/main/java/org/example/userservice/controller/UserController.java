@@ -3,6 +3,7 @@ package org.example.userservice.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.example.userservice.dto.User;
+import org.example.userservice.dto.UserDto;
 import org.example.userservice.dto.login.LoginRequest;
 import org.example.userservice.dto.login.LoginResponse;
 import org.example.userservice.dto.register.RegisterUserResponse;
@@ -40,6 +41,15 @@ public class UserController {
 
         LoginResponse loginResponse = userService.loginUser(loginRequest);
         return loginResponse;
+    }
+
+    @GetMapping
+    public ResponseEntity<UserDto> getUserByEmail(@RequestParam("userEmail") String userEmail) {
+        final String methodName = "getUserByEmail";
+        log.entering(SOURCE_CLASS, methodName);
+
+        UserDto userDto = userService.getUserByEmail(userEmail);
+        return ResponseEntity.ok().body(userDto);
     }
 
     @GetMapping("/health-check")
