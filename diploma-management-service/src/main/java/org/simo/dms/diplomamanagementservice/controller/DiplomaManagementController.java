@@ -70,9 +70,9 @@ public class DiplomaManagementController {
     }
 
     @GetMapping()
-    public ResponseEntity<Page<DiplomaApplication>> getAllDiplomaApplications(@RequestParam int page, @RequestParam int size){
+    public ResponseEntity<Page<DiplomaApplicationDto>> getAllDiplomaApplications(@RequestParam int page, @RequestParam int size){
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<DiplomaApplication> diplomaApplicationPage = diplomaApplicationService.getAllDiplomaApplications(pageRequest);
+        Page<DiplomaApplicationDto> diplomaApplicationPage = diplomaApplicationService.getAllDiplomaApplications(pageRequest);
         return ResponseEntity.ok().body(diplomaApplicationPage);
     }
 }

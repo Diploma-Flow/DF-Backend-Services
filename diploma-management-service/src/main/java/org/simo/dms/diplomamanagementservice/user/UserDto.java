@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.simo.dms.diplomamanagementservice.enums.UserRole;
 
 /**
  * Author: Simeon Popov
@@ -25,4 +26,5 @@ public class UserDto {
     private String firstName;
     private String middleName;
     private String lastName;
+    private UserRole role;
 }

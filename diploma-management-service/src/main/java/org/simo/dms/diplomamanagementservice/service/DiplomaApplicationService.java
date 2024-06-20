@@ -231,8 +231,11 @@ public class DiplomaApplicationService {
         return diplomaApplicationDtos;
     }
 
-    public Page<DiplomaApplication> getAllDiplomaApplications(PageRequest pageRequest){
-        Page<DiplomaApplication> page = diplomaApplicationRepository.findAll(pageRequest);
+    public Page<DiplomaApplicationDto> getAllDiplomaApplications(PageRequest pageRequest){
+        Page<DiplomaApplicationDto> page = diplomaApplicationRepository
+                .findAll(pageRequest)
+                .map(application -> modelMapper.map(application, DiplomaApplicationDto.class));
+
         return page;
     }
 }

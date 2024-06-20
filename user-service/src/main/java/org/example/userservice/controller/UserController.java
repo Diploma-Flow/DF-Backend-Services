@@ -43,7 +43,7 @@ public class UserController {
         return loginResponse;
     }
 
-    @GetMapping
+    @GetMapping("/get-user")
     public ResponseEntity<UserDto> getUserByEmail(@RequestParam("userEmail") String userEmail) {
         final String methodName = "getUserByEmail";
         log.entering(SOURCE_CLASS, methodName);
