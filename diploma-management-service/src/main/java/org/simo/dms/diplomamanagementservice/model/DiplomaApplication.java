@@ -29,7 +29,7 @@ public class DiplomaApplication {
             type = PrefixSequenceIdGenerator.class,
             parameters = {
                     @org.hibernate.annotations.Parameter(name = PrefixSequenceIdGenerator.INCREMENT_PARAM, value = "1"),
-                    @org.hibernate.annotations.Parameter(name = PrefixSequenceIdGenerator.VALUE_PREFIX_PARAMETER, value = "AP"),
+                    @org.hibernate.annotations.Parameter(name = PrefixSequenceIdGenerator.VALUE_PREFIX_PARAMETER, value = "AP-"),
                     @org.hibernate.annotations.Parameter(name = PrefixSequenceIdGenerator.NUMBER_FORMAT_PARAMETER, value = "%05d") })
     @Column(updatable = false)
     private String id;

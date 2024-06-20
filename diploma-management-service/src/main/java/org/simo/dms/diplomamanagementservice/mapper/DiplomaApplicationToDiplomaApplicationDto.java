@@ -20,13 +20,11 @@ public class DiplomaApplicationToDiplomaApplicationDto implements Converter<Dipl
 
     private final UserServiceClient userServiceClient;
 
-    //FIXME it works here but after here the correct object is returned something crumbles
     @Override
     public DiplomaApplicationDto convert(MappingContext<DiplomaApplication, DiplomaApplicationDto> context) {
         DiplomaApplication source = context.getSource();
         DiplomaApplicationDto destination = context.getDestination() == null ? new DiplomaApplicationDto() : context.getDestination();
 
-        // Map simple fields
         destination.setId(source.getId());
         destination.setTitle(source.getTitle());
         destination.setStatus(source.getStatus());
@@ -34,11 +32,9 @@ public class DiplomaApplicationToDiplomaApplicationDto implements Converter<Dipl
         destination.setTasks(source.getTasks());
         destination.setTechStack(source.getTechStack());
 
-        // Fetch UserDto for owner and supervisor
         UserDto owner = userServiceClient.getUserByEmailOrDefault(source.getOwnerEmail());
         UserDto supervisor = userServiceClient.getUserByEmailOrDefault(source.getSupervisorEmail());
 
-        // Set UserDto fields in the destination
         destination.setOwner(owner);
         destination.setSupervisor(supervisor);
 
