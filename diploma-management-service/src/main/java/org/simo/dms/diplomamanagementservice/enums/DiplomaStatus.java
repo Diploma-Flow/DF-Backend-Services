@@ -5,5 +5,5 @@ package org.simo.dms.diplomamanagementservice.enums;
  * Date of creation: 6/19/2024
  */
 public enum DiplomaStatus {
-    OPENED, SENT_FOR_APPROVAL, APPROVED, REJECTED, CANCELED
+    OPENED, SENT, APPROVED, REJECTED, CANCELLED
 }

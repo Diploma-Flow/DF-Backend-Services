@@ -15,7 +15,6 @@ import org.simo.dms.diplomamanagementservice.response.DiplomaApplicationDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -92,7 +91,7 @@ public class DiplomaApplicationService {
             throw new RuntimeException("Application status must be in OPENED in order to send for approval");
         }
 
-        application.setStatus(DiplomaStatus.SENT_FOR_APPROVAL);
+        application.setStatus(DiplomaStatus.SENT);
         diplomaApplicationRepository.save(application);
     }
 
@@ -119,7 +118,7 @@ public class DiplomaApplicationService {
             throw new IllegalCallerException(errorMessage);
         }
 
-        application.setStatus(DiplomaStatus.CANCELED);
+        application.setStatus(DiplomaStatus.CANCELLED);
         diplomaApplicationRepository.save(application);
     }
 
@@ -145,8 +144,8 @@ public class DiplomaApplicationService {
             throw new IllegalCallerException(errorMessage);
         }
 
-        if (!application.getStatus().equals(DiplomaStatus.SENT_FOR_APPROVAL)) {
-            throw new RuntimeException("Application status must be in SENT_FOR_APPROVAL in order to send for approval");
+        if (!application.getStatus().equals(DiplomaStatus.SENT)) {
+            throw new RuntimeException("Application status must be in SENT status in order to send for approval");
         }
 
         application.setStatus(DiplomaStatus.REJECTED);
@@ -175,8 +174,8 @@ public class DiplomaApplicationService {
             throw new IllegalCallerException(errorMessage);
         }
 
-        if (!application.getStatus().equals(DiplomaStatus.SENT_FOR_APPROVAL)) {
-            throw new RuntimeException("Application status must be in SENT_FOR_APPROVAL in order to send for approval");
+        if (!application.getStatus().equals(DiplomaStatus.SENT)) {
+            throw new RuntimeException("Application status must be in SENT status in order to send for approval");
         }
 
         application.setStatus(DiplomaStatus.APPROVED);

@@ -60,7 +60,10 @@ public class UserServiceClient {
                     String response = userRegistrationResponse.getResponse();
 
                     if(res.getStatusCode().value() == HttpStatus.BAD_REQUEST.value()){
-                        throw new UserAlreadyRegisteredException(response);
+                        if(userRegistrationResponse.getResponse().startsWith("Duplicate entry")){
+                            log.warn(userRegistrationResponse.getResponse());
+                            throw new UserAlreadyRegisteredException("Email already registered");
+                        }
                     }
 
                     throw new UserServiceInternalServerError(response);
