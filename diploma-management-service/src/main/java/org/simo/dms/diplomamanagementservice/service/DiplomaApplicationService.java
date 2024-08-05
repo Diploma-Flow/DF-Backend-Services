@@ -58,7 +58,7 @@ public class DiplomaApplicationService {
 
         UserDto supervisorUserDto = userServiceClient.getUserByEmail(supervisorEmail);
         if(!supervisorUserDto.getRole().equals(UserRole.PROFESSOR)) {
-            throw new IllegalArgumentException("Supervisor email is not a professor email");
+            throw new IllegalArgumentException("Supervisor email must be a valid professor email");
         }
 
         DiplomaApplication newApplication = modelMapper.map(request, DiplomaApplication.class);

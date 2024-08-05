@@ -41,7 +41,7 @@ public class UserServiceClient {
                 .uri(uri)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    throw new UserNotFoundException(email);
+                    throw new UserNotFoundException("No such user email");
                 })
                 .body(UserDto.class);
 
