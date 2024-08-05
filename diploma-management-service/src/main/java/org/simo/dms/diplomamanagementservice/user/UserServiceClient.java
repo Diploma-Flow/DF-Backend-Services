@@ -1,9 +1,12 @@
 package org.simo.dms.diplomamanagementservice.user;
 
 import lombok.extern.log4j.Log4j2;
+import org.simo.dms.diplomamanagementservice.exception.exception.UserNotFoundException;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -37,6 +40,9 @@ public class UserServiceClient {
                 .get()
                 .uri(uri)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                    throw new UserNotFoundException(email);
+                })
                 .body(UserDto.class);
 
         return userDto;

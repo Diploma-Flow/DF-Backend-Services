@@ -12,6 +12,8 @@ import org.simo.dms.diplomamanagementservice.model.DiplomaApplication;
 import org.simo.dms.diplomamanagementservice.repository.DiplomaApplicationRepository;
 import org.simo.dms.diplomamanagementservice.request.CreateDiplomaApplication;
 import org.simo.dms.diplomamanagementservice.response.DiplomaApplicationDto;
+import org.simo.dms.diplomamanagementservice.user.UserDto;
+import org.simo.dms.diplomamanagementservice.user.UserServiceClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import java.util.List;
 public class DiplomaApplicationService {
     private final ModelMapper modelMapper;
     private final DiplomaApplicationRepository diplomaApplicationRepository;
+    private final UserServiceClient userServiceClient;
 
 
     public DiplomaApplicationDto createDiplomaApplication(CreateDiplomaApplication request) {
@@ -45,6 +48,17 @@ public class DiplomaApplicationService {
             String errorMessage = "Caller email does not match owner email";
             log.error(errorMessage);
             throw new IllegalCallerException(errorMessage);
+        }
+
+        //FIXME check if the supervisor exists and if not to throw error
+        String supervisorEmail = request
+                .getSupervisorEmail()
+                .toLowerCase()
+                .trim();
+
+        UserDto supervisorUserDto = userServiceClient.getUserByEmail(supervisorEmail);
+        if(!supervisorUserDto.getRole().equals(UserRole.PROFESSOR)) {
+            throw new IllegalArgumentException("Supervisor email is not a professor email");
         }
 
         DiplomaApplication newApplication = modelMapper.map(request, DiplomaApplication.class);
