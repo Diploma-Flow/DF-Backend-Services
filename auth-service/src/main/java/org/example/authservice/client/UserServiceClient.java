@@ -62,7 +62,7 @@ public class UserServiceClient {
                     if(res.getStatusCode().value() == HttpStatus.BAD_REQUEST.value()){
                         if(userRegistrationResponse.getResponse().startsWith("Duplicate entry")){
                             log.warn(userRegistrationResponse.getResponse());
-                            throw new UserAlreadyRegisteredException("Email already registered");
+                            throw new UserAlreadyRegisteredException("Email already exists");
                         }
                     }
 

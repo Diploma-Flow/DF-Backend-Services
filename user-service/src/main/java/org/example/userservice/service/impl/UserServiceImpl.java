@@ -7,6 +7,7 @@ import org.example.userservice.dto.login.LoginRequest;
 import org.example.userservice.dto.login.LoginResponse;
 import org.example.userservice.dto.register.RegisterUserResponse;
 import org.example.userservice.dto.register.RegisterUserRequest;
+import org.example.userservice.enums.UserRole;
 import org.example.userservice.exception.exceptions.UserNotFoundException;
 import org.example.userservice.model.UserAccount;
 import org.example.userservice.model.UserDetails;
@@ -15,6 +16,8 @@ import org.example.userservice.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -83,6 +86,13 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto = modelMapper.map(userAccount, UserDto.class);
         return userDto;
+    }
+
+    @Override
+    public Page<UserDto> getUsersByRole(UserRole userRole, PageRequest pageRequest) {
+        return userAccountRepository
+                .findByRole(userRole, pageRequest)
+                .map(userAccount -> modelMapper.map(userAccount, UserDto.class));
     }
 
     public String generateUniqueUsername(String firstName, String lastName) {

@@ -8,9 +8,14 @@ import org.example.userservice.dto.login.LoginRequest;
 import org.example.userservice.dto.login.LoginResponse;
 import org.example.userservice.dto.register.RegisterUserResponse;
 import org.example.userservice.dto.register.RegisterUserRequest;
+import org.example.userservice.enums.UserRole;
 import org.example.userservice.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Author: Simeon Popov
@@ -50,6 +55,16 @@ public class UserController {
 
         UserDto userDto = userService.getUserByEmail(userEmail);
         return ResponseEntity.ok().body(userDto);
+    }
+
+    @GetMapping("/get-users")
+    public ResponseEntity<Page<UserDto>> getUsersByRole(@RequestParam int page, @RequestParam int size, @RequestParam UserRole userRole) {
+        final String methodName = "getUsersByRole";
+        log.entering(SOURCE_CLASS, methodName);
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<UserDto> userDtos = userService.getUsersByRole(userRole, pageRequest);
+        return ResponseEntity.ok().body(userDtos);
     }
 
     @GetMapping("/health-check")
